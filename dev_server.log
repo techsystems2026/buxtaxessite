@@ -1,0 +1,50 @@
+
+> web_temp@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.0.2:3001
+
+ ✓ Starting...
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 1849ms (794 modules)
+ ⨯ Error: Invalid src prop (https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (../src/shared/lib/image-loader.ts:74:17)
+    at eval (../src/shared/lib/get-img-props.ts:239:14)
+    at Array.map (<anonymous>)
+    at generateImgAttrs (../src/shared/lib/get-img-props.ts:237:8)
+    at getImgProps (../src/shared/lib/get-img-props.ts:711:25)
+    at eval (../src/client/image-component.tsx:389:53)
+  72 |           !hasRemoteMatch(config.domains!, config.remotePatterns!, parsedSrc)
+  73 |         ) {
+> 74 |           throw new Error(
+     |                 ^
+  75 |             `Invalid src prop (${src}) on \`next/image\`, hostname "${parsedSrc.hostname}" is not configured under images in your \`next.config.js\`\n` +
+  76 |               `See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host`
+  77 |           ) {
+  digest: '1518016020'
+}
+ GET / 500 in 3669ms
+ ⨯ Error: Invalid src prop (https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (../src/shared/lib/image-loader.ts:74:17)
+    at eval (../src/shared/lib/get-img-props.ts:239:14)
+    at Array.map (<anonymous>)
+    at generateImgAttrs (../src/shared/lib/get-img-props.ts:237:8)
+    at getImgProps (../src/shared/lib/get-img-props.ts:711:25)
+    at eval (../src/client/image-component.tsx:389:53)
+  72 |           !hasRemoteMatch(config.domains!, config.remotePatterns!, parsedSrc)
+  73 |         ) {
+> 74 |           throw new Error(
+     |                 ^
+  75 |             `Invalid src prop (${src}) on \`next/image\`, hostname "${parsedSrc.hostname}" is not configured under images in your \`next.config.js\`\n` +
+  76 |               `See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host`
+  77 |           ) {
+  digest: '1518016020'
+}
+ GET / 500 in 233ms
+ ✓ Compiled in 2.3s (808 modules)
