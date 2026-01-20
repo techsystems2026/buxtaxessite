@@ -40,9 +40,9 @@ export function Navbar() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-4 items-center">
-          <a href="tel:+77000000000" className="text-sm font-semibold flex items-center gap-2">
+          <a href="tel:+77771234567" className="text-sm font-semibold flex items-center gap-2">
             <Phone className="h-4 w-4 text-primary" />
-            +7 (700) 000-00-00
+            +7 (777) 123-45-67
           </a>
           <Button asChild>
             <Link href="/contacts">Заказать звонок</Link>

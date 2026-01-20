@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { CheckCircle2 } from 'lucide-react'
 
 const steps = [
   {
     id: 'type',
-    question: "Выберите ваш тип бизнеса",
-    options: ["ИП (Индивидуальный предприниматель)", "ТОО (Товарищество с огр. ответственностью)", "Физ. лицо / Самозанятый"]
+    question: "Выберите ваш вид деятельности",
+    options: ["Торговля (опт/розница)", "Услуги", "Производственное предприятие", "IT / Фриланс", "Другое"]
   },
   {
     id: 'regime',
@@ -20,12 +21,12 @@ const steps = [
   {
     id: 'turnover',
     question: "Примерный оборот в месяц (в тенге)",
-    options: ["До 1 млн", "1 - 5 млн", "5 - 20 млн", "Более 20 млн"]
+    options: ["До 1 млн", "1 - 10 млн", "10 - 50 млн", "Более 50 млн"]
   },
   {
     id: 'staff',
     question: "Количество сотрудников",
-    options: ["Нет сотрудников", "1 - 5 человек", "5 - 20 человек", "Более 20 человек"]
+    options: ["Нет сотрудников", "1 - 5 человек", "5 - 15 человек", "Более 15 человек"]
   }
 ]
 
@@ -59,12 +60,15 @@ export function Quiz() {
       <section className="py-24 bg-slate-900 text-white overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="max-w-3xl mx-auto bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-slate-700 text-center">
+            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <CheckCircle2 className="w-12 h-12 text-primary" />
+            </div>
             <h2 className="text-3xl font-bold mb-6">ОТЛИЧНО! МЫ ПОЧТИ ЗАКОНЧИЛИ</h2>
-            <p className="text-slate-400 mb-8">Оставьте ваши контакты, и мы вышлем вам расчет стоимости в течение 15 минут</p>
-            <form className="space-y-4 max-w-sm mx-auto">
-              <Input placeholder="Ваше имя" className="bg-slate-700 border-slate-600 h-12" />
-              <Input placeholder="+7 (___) ___-__-__" className="bg-slate-700 border-slate-600 h-12" />
-              <Button className="w-full h-12 text-lg font-bold">Получить расчет</Button>
+            <p className="text-slate-400 mb-8 max-w-md mx-auto">Оставьте ваши контакты, и мы подготовим для вас индивидуальное предложение по расчету стоимости в течение 15 минут.</p>
+            <form className="space-y-4 max-w-sm mx-auto" onSubmit={(e) => e.preventDefault()}>
+              <Input placeholder="Ваше имя" className="bg-slate-700 border-slate-600 h-12 text-white placeholder:text-slate-400 focus:ring-primary" />
+              <Input placeholder="+7 (___) ___-__-__" className="bg-slate-700 border-slate-600 h-12 text-white placeholder:text-slate-400 focus:ring-primary" />
+              <Button className="w-full h-12 text-lg font-bold bg-primary hover:bg-primary/90 text-white transition-all">Получить предложение</Button>
             </form>
           </div>
         </div>
@@ -83,7 +87,8 @@ export function Quiz() {
         <div className="max-w-3xl mx-auto bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-slate-700">
           <div className="mb-8">
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-primary font-semibold">Вопрос {currentStep + 1} из {steps.length}</span>
+              <span className="text-primary font-semibold uppercase tracking-wider">Вопрос {currentStep + 1} из {steps.length}</span>
+              <span className="text-slate-400">{Math.round(progress)}% завершено</span>
             </div>
             <div className="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
               <div
@@ -93,7 +98,7 @@ export function Quiz() {
             </div>
           </div>
 
-          <div className="min-h-[300px]">
+          <div className="min-h-[350px]">
             <h3 className="text-xl md:text-2xl font-bold mb-8">{steps[currentStep].question}</h3>
 
             <RadioGroup
@@ -103,22 +108,22 @@ export function Quiz() {
             >
               {steps[currentStep].options.map((option) => (
                 <div key={option} className="flex items-center space-x-2">
-                  <div className={`flex items-center w-full p-4 rounded-xl border transition-all cursor-pointer ${
+                  <div className={`flex items-center w-full p-5 rounded-2xl border transition-all cursor-pointer ${
                     answers[steps[currentStep].id] === option
                       ? 'border-primary bg-primary/10'
-                      : 'border-slate-600 hover:border-slate-500'
+                      : 'border-slate-600 hover:border-slate-500 bg-slate-700/30'
                   }`}>
                     <RadioGroupItem value={option} id={option} className="sr-only" />
                     <Label
                       htmlFor={option}
-                      className="flex-grow cursor-pointer text-base md:text-lg font-medium"
+                      className="flex-grow cursor-pointer text-base md:text-lg font-medium leading-none"
                     >
                       {option}
                     </Label>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                       answers[steps[currentStep].id] === option ? 'border-primary' : 'border-slate-500'
                     }`}>
-                      {answers[steps[currentStep].id] === option && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                      {answers[steps[currentStep].id] === option && <div className="w-3 h-3 rounded-full bg-primary" />}
                     </div>
                   </div>
                 </div>
@@ -131,16 +136,16 @@ export function Quiz() {
               variant="outline"
               onClick={handlePrev}
               disabled={currentStep === 0}
-              className="bg-transparent border-slate-600 text-white hover:bg-slate-700 disabled:opacity-30"
+              className="bg-transparent border-slate-600 text-white hover:bg-slate-700 disabled:opacity-30 h-12 px-8"
             >
               Назад
             </Button>
             <Button
               onClick={handleNext}
               disabled={!answers[steps[currentStep].id]}
-              className="min-w-[120px]"
+              className="min-w-[140px] h-12 px-8 bg-primary hover:bg-primary/90 text-white font-bold"
             >
-              {currentStep === steps.length - 1 ? 'К последнему шагу' : 'Далее'}
+              {currentStep === steps.length - 1 ? 'Завершить' : 'Далее'}
             </Button>
           </div>
         </div>
