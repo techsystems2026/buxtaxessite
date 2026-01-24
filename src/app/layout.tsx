@@ -25,8 +25,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'BUX&TAXES',
+    url: 'https://buxtaxes.kz',
+    logo: 'https://buxtaxes.kz/logo.png',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+7-777-123-4567',
+      contactType: 'customer service',
+      areaServed: 'KZ',
+      availableLanguage: ['Russian', 'Kazakh'],
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'пр. Аль-Фараби 17, БЦ Нурлы Тау',
+      addressLocality: 'Алматы',
+      addressCountry: 'KZ',
+    },
+  }
+
   return (
     <html lang="ru">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${manrope.variable} font-manrope antialiased flex flex-col min-h-screen`}
       >

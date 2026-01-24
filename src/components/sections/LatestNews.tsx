@@ -1,19 +1,25 @@
-import { Badge } from '@/components/ui/badge'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import Link from 'next/link'
 import { Calendar, ArrowRight } from 'lucide-react'
 
+interface NewsItem {
+  title: string
+  excerpt?: string | null
+  publishedAt?: string | null
+  slug: string
+}
+
 export async function LatestNews() {
   const payload = await getPayload({ config })
-  const { docs: news } = await payload.find({
+  const { docs } = await payload.find({
     collection: 'blog',
     limit: 3,
     sort: '-publishedAt',
   })
 
   // Fallback
-  const displayNews = news.length > 0 ? news : [
+  const displayNews = (docs.length > 0 ? docs : [
     {
       title: 'Изменения в налоговом кодексе 2025',
       excerpt: 'Разбираем основные поправки, которые коснутся малого и среднего бизнеса в Казахстане в новом году.',
@@ -32,7 +38,7 @@ export async function LatestNews() {
       publishedAt: '2024-10-20',
       slug: 'tax-penalties',
     }
-  ]
+  ]) as unknown as NewsItem[]
 
   return (
     <section id="blog" className="py-24 bg-white">

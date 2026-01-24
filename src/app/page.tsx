@@ -7,8 +7,19 @@ import { Clients } from '@/components/sections/Clients'
 import { Contacts } from '@/components/sections/Contacts'
 
 export default function Home() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'BUX&TAXES',
+    url: 'https://buxtaxes.kz',
+  }
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Hero />
       <ServicesOverview />
       <LatestNews />

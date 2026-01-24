@@ -5,12 +5,58 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Calculator as CalcIcon, Info, RefreshCw, Send } from 'lucide-react'
+import { Calculator as CalcIcon, Info, RefreshCw, Download, Mail } from 'lucide-react'
 import Link from 'next/link'
+
+interface TaxResults {
+  revenue: number
+  ipn: number
+  socialTax: number
+  finalSocialTax: number
+  opv: number
+  so: number
+  vosms: number
+  totalFixed: number
+  totalToPay: number
+  netIncome: number
+}
 
 export default function IPTaxCalculatorPage() {
   const [revenue, setRevenue] = useState<number>(0)
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<TaxResults | null>(null)
+  const [emailLoading, setEmailLoading] = useState(false)
+
+  const sendEmail = async () => {
+    if (!results) return
+    setEmailLoading(true)
+    try {
+      const message = `Расчет налогов ИП (2025):
+Доход: ${revenue} ₸
+К уплате всего: ${results.totalToPay} ₸
+ИПН: ${results.ipn} ₸
+Соц. налог: ${results.finalSocialTax} ₸
+Взносы за ИП: ${results.totalFixed} ₸`
+
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Calculator User',
+          phone: 'requested via calc',
+          message: message,
+          source: 'IP Tax Calculator'
+        }),
+      })
+
+      if (response.ok) {
+        alert('Запрос на отправку результатов принят! Мы вышлем расчет на вашу почту (укажите её в форме контактов ниже для связи).')
+      }
+    } catch {
+      alert('Ошибка при отправке.')
+    } finally {
+      setEmailLoading(false)
+    }
+  }
 
   const calculate = () => {
     if (revenue < 0) return
@@ -156,11 +202,16 @@ export default function IPTaxCalculatorPage() {
               <p className="text-slate-600">Наши эксперты помогут выбрать оптимальный налоговый режим и настроить учет так, чтобы вы не переплачивали ни одного тенге.</p>
             </div>
             <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-              <Button size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none" asChild>
+              <Button size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none print:hidden" asChild>
                 <Link href="/#contacts">Получить консультацию</Link>
               </Button>
-              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200" asChild>
-                 <a href="https://wa.me/77000000000" target="_blank" rel="noopener noreferrer">Написать в WhatsApp</a>
+              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200 print:hidden" onClick={() => window.print()}>
+                <Download className="w-5 h-5 mr-2" />
+                Скачать PDF
+              </Button>
+              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200 print:hidden" onClick={sendEmail} disabled={emailLoading}>
+                <Mail className="w-5 h-5 mr-2" />
+                {emailLoading ? 'Отправка...' : 'На Email'}
               </Button>
             </div>
           </div>

@@ -1,23 +1,68 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Calculator as CalcIcon, Download, Send, RefreshCw, Info } from 'lucide-react'
+import { Calculator as CalcIcon, Download, RefreshCw, Info, Mail } from 'lucide-react'
 import Link from 'next/link'
+
+interface SalaryResults {
+  opv: number
+  vosms: number
+  ipn: number
+  netSalary: number
+  so: number
+  osms: number
+  sn: number
+  totalEmployerCost: number
+}
 
 export default function SalaryCalculatorPage() {
   const [grossSalary, setGrossSalary] = useState<number>(0)
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<SalaryResults | null>(null)
+  const [emailLoading, setEmailLoading] = useState(false)
+
+  const sendEmail = async () => {
+    if (!results) return
+    setEmailLoading(true)
+    try {
+      const message = `Расчет зарплаты (2025):
+Оклад: ${grossSalary} ₸
+На руки: ${results.netSalary} ₸
+ОПВ: ${results.opv} ₸
+ВОСМС: ${results.vosms} ₸
+ИПН: ${results.ipn} ₸
+Расходы работодателя: ${results.totalEmployerCost} ₸`
+
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Calculator User',
+          phone: 'requested via calc',
+          message: message,
+          source: 'Salary Calculator'
+        }),
+      })
+
+      if (response.ok) {
+        alert('Запрос на отправку результатов принят! Мы вышлем расчет на вашу почту (укажите её в форме контактов ниже для связи).')
+      }
+    } catch {
+      alert('Ошибка при отправке.')
+    } finally {
+      setEmailLoading(false)
+    }
+  }
 
   const calculate = () => {
     if (grossSalary <= 0) return
 
     // 2025 constants
     const MRP = 3932
-    const MIN_WAGE = 85000 // MZP
+    // const MIN_WAGE = 85000 // MZP
 
     // Employee deductions
     const opv = grossSalary * 0.10
@@ -25,7 +70,7 @@ export default function SalaryCalculatorPage() {
 
     // IPN (Income tax) - simplified: (Gross - OPV - VOSMS - 14*MRP) * 0.10
     const ipnDeduction = 14 * MRP
-    let ipnBase = grossSalary - opv - vosms - ipnDeduction
+    const ipnBase = grossSalary - opv - vosms - ipnDeduction
     const ipn = ipnBase > 0 ? ipnBase * 0.10 : 0
 
     const netSalary = grossSalary - opv - vosms - ipn
@@ -35,7 +80,7 @@ export default function SalaryCalculatorPage() {
     const osms = grossSalary * 0.03
 
     // SN (Social tax) - (Gross - OPV - VOSMS) * 9.5% - SO
-    let snBase = grossSalary - opv - vosms
+    const snBase = grossSalary - opv - vosms
     let sn = (snBase * 0.095) - so
     if (sn < 0) sn = 0
 
@@ -158,12 +203,16 @@ export default function SalaryCalculatorPage() {
               <p className="text-slate-600">Оставьте заявку, и мы поможем оптимизировать налоги на ФОТ и настроить кадровый учет без ошибок.</p>
             </div>
             <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-              <Button size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none" asChild>
+              <Button size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none print:hidden" asChild>
                 <Link href="/#contacts">Получить консультацию</Link>
               </Button>
-              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200">
+              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200 print:hidden" onClick={() => window.print()}>
                 <Download className="w-5 h-5 mr-2" />
                 Скачать PDF
+              </Button>
+              <Button variant="outline" size="lg" className="h-14 px-8 font-bold flex-1 lg:flex-none border-slate-200 print:hidden" onClick={sendEmail} disabled={emailLoading}>
+                <Mail className="w-5 h-5 mr-2" />
+                {emailLoading ? 'Отправка...' : 'На Email'}
               </Button>
             </div>
           </div>

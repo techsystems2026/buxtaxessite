@@ -43,7 +43,7 @@ export default async function TariffsPage() {
                       </div>
 
                       <ul className="space-y-4 mb-8 flex-grow">
-                        {tariff.features?.map((f: any, i: number) => (
+                        {tariff.features?.map((f: { feature?: string | null }, i: number) => (
                           <li key={i} className="flex items-start gap-3 text-slate-600 text-sm">
                             <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
                             <span>{f.feature}</span>

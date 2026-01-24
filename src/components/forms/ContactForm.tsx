@@ -34,7 +34,7 @@ export function ContactForm() {
       } else {
         throw new Error('Failed to submit')
       }
-    } catch (error) {
+    } catch {
       toast.error('Произошла ошибка при отправке. Пожалуйста, попробуйте позже.')
     } finally {
       setLoading(false)

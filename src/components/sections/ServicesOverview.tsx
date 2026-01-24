@@ -5,15 +5,22 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { Briefcase } from 'lucide-react'
 
+interface ServiceItem {
+  title: string
+  slug: string
+  shortDescription: string
+  priceFrom?: string | null
+}
+
 export async function ServicesOverview() {
   const payload = await getPayload({ config })
-  const { docs: services } = await payload.find({
+  const { docs } = await payload.find({
     collection: 'services',
     limit: 10,
   })
 
   // Fallback if no services in DB yet
-  const displayServices = services.length > 0 ? services : [
+  const displayServices = (docs.length > 0 ? docs : [
     {
       title: 'Бухгалтерское сопровождение ИП',
       slug: 'ip-bookkeeping',
@@ -50,7 +57,7 @@ export async function ServicesOverview() {
       shortDescription: 'Проверка налоговых рисков и профессиональные консультации по оптимизации.',
       priceFrom: 'от 30 000 ₸',
     }
-  ]
+  ]) as unknown as ServiceItem[]
 
   return (
     <section id="services" className="py-24 bg-slate-50">

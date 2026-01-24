@@ -5,12 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar, ArrowRight } from 'lucide-react'
 
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt?: string | null
+  publishedAt?: string | null
+}
+
 export default async function BlogPage() {
   const payload = await getPayload({ config })
-  const { docs: posts } = await payload.find({
+  const { docs } = await payload.find({
     collection: 'blog',
     sort: '-publishedAt',
   })
+  const posts = docs as unknown as BlogPost[]
 
   return (
     <main className="bg-slate-50 py-24">

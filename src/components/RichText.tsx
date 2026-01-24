@@ -1,28 +1,43 @@
 import React from 'react'
 
-export function RichText({ content }: { content: any }) {
+interface LexicalNode {
+  type: string
+  tag?: string
+  listType?: string
+  format?: number
+  text?: string
+  fields?: {
+    url?: string
+    newTab?: boolean
+  }
+  children?: LexicalNode[]
+}
+
+export function RichText({ content }: { content: { root: { children: LexicalNode[] } } | null | undefined }) {
   if (!content || !content.root || !content.root.children) {
     return null
   }
 
   return (
     <div className="rich-text">
-      {content.root.children.map((node: any, index: number) => (
+      {content.root.children.map((node, index) => (
         <RenderNode key={index} node={node} />
       ))}
     </div>
   )
 }
 
-function RenderNode({ node }: { node: any }) {
+function RenderNode({ node }: { node: LexicalNode }) {
   switch (node.type) {
     case 'heading':
-      const HeadingTag = `h${node.tag || '2'}` as keyof JSX.IntrinsicElements
-      return (
-        <HeadingTag className="font-bold text-slate-900 mt-8 mb-4">
-          <RenderChildren nodes={node.children} />
-        </HeadingTag>
-      )
+      {
+        const HeadingTag = `h${node.tag || '2'}` as keyof React.JSX.IntrinsicElements
+        return (
+          <HeadingTag className="font-bold text-slate-900 mt-8 mb-4">
+            <RenderChildren nodes={node.children} />
+          </HeadingTag>
+        )
+      }
     case 'paragraph':
       return (
         <p className="mb-4 leading-relaxed text-slate-700">
@@ -30,12 +45,14 @@ function RenderNode({ node }: { node: any }) {
         </p>
       )
     case 'list':
-      const ListTag = node.listType === 'number' ? 'ol' : 'ul'
-      return (
-        <ListTag className={`mb-6 ml-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} space-y-2 text-slate-700`}>
-          <RenderChildren nodes={node.children} />
-        </ListTag>
-      )
+      {
+        const ListTag = node.listType === 'number' ? 'ol' : 'ul'
+        return (
+          <ListTag className={`mb-6 ml-6 ${node.listType === 'number' ? 'list-decimal' : 'list-disc'} space-y-2 text-slate-700`}>
+            <RenderChildren nodes={node.children} />
+          </ListTag>
+        )
+      }
     case 'listitem':
       return (
         <li>
@@ -43,10 +60,14 @@ function RenderNode({ node }: { node: any }) {
         </li>
       )
     case 'text':
-      let text = node.text
-      if (node.format & 1) text = <strong key="bold">{text}</strong> // IS_BOLD
-      if (node.format & 2) text = <em key="italic">{text}</em> // IS_ITALIC
-      return text
+      {
+        let text: React.ReactNode = node.text || ''
+        if (typeof node.format === 'number') {
+          if (node.format & 1) text = <strong key="bold">{text}</strong> // IS_BOLD
+          if (node.format & 2) text = <em key="italic">{text}</em> // IS_ITALIC
+        }
+        return text
+      }
     case 'link':
       return (
         <a href={node.fields?.url} className="text-primary hover:underline" target={node.fields?.newTab ? '_blank' : undefined}>
@@ -61,7 +82,7 @@ function RenderNode({ node }: { node: any }) {
   }
 }
 
-function RenderChildren({ nodes }: { nodes: any[] }) {
+function RenderChildren({ nodes }: { nodes: LexicalNode[] | undefined }) {
   if (!nodes) return null
   return (
     <>

@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { CheckCircle2, HelpCircle, ArrowRight } from 'lucide-react'
+import { CheckCircle2, HelpCircle } from 'lucide-react'
 import { RichText } from '@/components/RichText'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -12,7 +12,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { JSX } from 'react'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -54,8 +53,48 @@ export default async function ServicePage({ params }: PageProps) {
 
   const service = docs[0]
 
+  const serviceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.title,
+    description: service.shortDescription,
+    provider: {
+      '@type': 'Organization',
+      name: 'BUX&TAXES',
+    },
+    areaServed: 'KZ',
+    offers: {
+      '@type': 'Offer',
+      price: service.priceFrom?.replace(/[^0-9]/g, ''),
+      priceCurrency: 'KZT',
+    },
+  }
+
+  const faqJsonLd = service.faq && service.faq.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: service.faq.map((item: { question?: string | null, answer?: string | null }) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  } : null
+
   return (
     <main className="bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       {/* Hero Section */}
       <section className="bg-slate-50 py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -92,7 +131,7 @@ export default async function ServicePage({ params }: PageProps) {
                 <div className="mt-16">
                   <h2 className="text-2xl font-bold text-slate-900 mb-8">Что входит в услугу</h2>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.whatIsIncluded.map((item, index) => (
+                    {service.whatIsIncluded.map((item: { item?: string | null }, index: number) => (
                       <li key={index} className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
                         <span className="text-slate-700">{item.item}</span>
@@ -106,7 +145,7 @@ export default async function ServicePage({ params }: PageProps) {
                 <div className="mt-16">
                   <h2 className="text-2xl font-bold text-slate-900 mb-8">Какие отчеты мы сдаем</h2>
                   <div className="flex flex-wrap gap-3">
-                    {service.reports.map((report, index) => (
+                    {service.reports.map((report: { report?: string | null }, index: number) => (
                       <span key={index} className="px-4 py-2 bg-primary/5 text-primary font-medium rounded-full border border-primary/10">
                         {report.report}
                       </span>
@@ -155,7 +194,7 @@ export default async function ServicePage({ params }: PageProps) {
                 Частые вопросы по услуге
               </h2>
               <Accordion type="single" collapsible className="w-full space-y-4">
-                {service.faq.map((item, index) => (
+                {service.faq.map((item: { question?: string | null, answer?: string | null }, index: number) => (
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}
