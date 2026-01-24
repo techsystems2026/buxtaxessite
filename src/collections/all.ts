@@ -24,6 +24,7 @@ export const Services: CollectionConfig = {
       type: 'array',
       fields: [{ name: 'report', type: 'text' }],
     },
+    { name: 'whoLeadsAccount', type: 'text' },
     { name: 'responsibility', type: 'textarea' },
     { name: 'priceFrom', type: 'text' },
     {

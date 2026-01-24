@@ -25,12 +25,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://buxtaxes.kz'
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'BUX&TAXES',
-    url: 'https://buxtaxes.kz',
-    logo: 'https://buxtaxes.kz/logo.png',
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+7-777-123-4567',

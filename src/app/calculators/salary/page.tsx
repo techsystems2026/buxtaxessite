@@ -15,6 +15,7 @@ interface SalaryResults {
   netSalary: number
   so: number
   osms: number
+  opvm: number
   sn: number
   totalEmployerCost: number
 }
@@ -62,9 +63,9 @@ export default function SalaryCalculatorPage() {
 
     // 2025 constants
     const MRP = 3932
-    // const MIN_WAGE = 85000 // MZP
+    // const MZP = 85000
 
-    // Employee deductions
+    // Employee deductions (удержания)
     const opv = grossSalary * 0.10
     const vosms = grossSalary * 0.02
 
@@ -75,16 +76,17 @@ export default function SalaryCalculatorPage() {
 
     const netSalary = grossSalary - opv - vosms - ipn
 
-    // Employer taxes
+    // Employer taxes (отчисления)
     const so = (grossSalary - opv) * 0.035
     const osms = grossSalary * 0.03
+    const opvm = grossSalary * 0.025 // OPVM for 2025
 
     // SN (Social tax) - (Gross - OPV - VOSMS) * 9.5% - SO
     const snBase = grossSalary - opv - vosms
     let sn = (snBase * 0.095) - so
     if (sn < 0) sn = 0
 
-    const totalEmployerCost = grossSalary + osms + sn + so // Simplified
+    const totalEmployerCost = grossSalary + osms + sn + so + opvm
 
     setResults({
       opv,
@@ -93,6 +95,7 @@ export default function SalaryCalculatorPage() {
       netSalary,
       so,
       osms,
+      opvm,
       sn,
       totalEmployerCost
     })
@@ -180,6 +183,10 @@ export default function SalaryCalculatorPage() {
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-400">ОСМС (3%)</span>
                       <span className="font-medium">{results.osms.toLocaleString()} ₸</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-400">ОПВР (2.5%)</span>
+                      <span className="font-medium">{results.opvm.toLocaleString()} ₸</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-400">Соц. налог</span>

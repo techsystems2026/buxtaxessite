@@ -49,8 +49,24 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const post = docs[0]
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.publishedAt,
+    author: {
+      '@type': 'Organization',
+      name: 'BUX&TAXES',
+    },
+  }
+
   return (
     <article className="bg-white min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-4xl px-6 lg:px-8 py-16 lg:py-24">
         <Link href="/blog" className="flex items-center gap-2 text-sm font-semibold text-primary mb-12">
           <ChevronLeft className="w-4 h-4" />

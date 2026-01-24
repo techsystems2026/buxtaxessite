@@ -159,6 +159,17 @@ export default async function ServicePage({ params }: PageProps) {
 
             <aside className="space-y-8">
               <div className="bg-slate-900 rounded-3xl p-8 text-white sticky top-24">
+                {service.whoLeadsAccount && (
+                  <div className="mb-8 pb-8 border-b border-slate-800">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Кто ведет учет</h3>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-xl font-bold">
+                        {service.whoLeadsAccount.charAt(0)}
+                      </div>
+                      <div className="font-bold text-lg">{service.whoLeadsAccount}</div>
+                    </div>
+                  </div>
+                )}
                 <h3 className="text-xl font-bold mb-4">Стоимость услуги</h3>
                 <div className="text-4xl font-bold text-primary mb-2">
                   {service.priceFrom}
