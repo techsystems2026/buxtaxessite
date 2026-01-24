@@ -4,6 +4,8 @@ import { Check, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TariffsPage() {
   const payload = await getPayload({ config })
   const { docs: tariffs } = await payload.find({

@@ -6,6 +6,8 @@ import { FAQ } from '@/components/sections/FAQ'
 import { Clients } from '@/components/sections/Clients'
 import { Contacts } from '@/components/sections/Contacts'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const jsonLd = {
     '@context': 'https://schema.org',

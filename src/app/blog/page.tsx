@@ -13,6 +13,8 @@ interface BlogPost {
   publishedAt?: string | null
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function BlogPage() {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
