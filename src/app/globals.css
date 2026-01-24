@@ -114,3 +114,38 @@
     @apply font-serif font-bold;
   }
 }
+
+@media print {
+  nav, footer, .print-hidden, button, .print\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .mx-auto {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  card, .shadow-xl, .shadow-2xl {
+    box-shadow: none !important;
+    border: 1px solid #eee !important;
+  }
+
+  .bg-slate-900 {
+    background-color: #f8fafc !important;
+    color: black !important;
+  }
+
+  .text-white {
+    color: black !important;
+  }
+
+  .text-primary {
+    color: #2563eb !important;
+  }
+}

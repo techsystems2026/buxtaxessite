@@ -25,9 +25,10 @@ export function Footer() {
               <div className="mt-10 md:mt-0">
                 <h3 className="text-sm font-semibold leading-6 text-white">Компания</h3>
                 <ul role="list" className="mt-6 space-y-4">
+                  <li><Link href="/about" className="text-sm leading-6 text-gray-300 hover:text-white">О компании</Link></li>
+                  <li><Link href="/calculators" className="text-sm leading-6 text-gray-300 hover:text-white">Калькуляторы</Link></li>
                   <li><Link href="/blog" className="text-sm leading-6 text-gray-300 hover:text-white">Блог</Link></li>
                   <li><Link href="/tariffs" className="text-sm leading-6 text-gray-300 hover:text-white">Тарифы</Link></li>
-                  <li><Link href="/contacts" className="text-sm leading-6 text-gray-300 hover:text-white">Контакты</Link></li>
                 </ul>
               </div>
             </div>

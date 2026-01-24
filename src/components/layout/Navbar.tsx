@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button'
 const navigation = [
   { name: 'Услуги', href: '/#services' },
   { name: 'Тарифы', href: '/tariffs' },
+  { name: 'Калькуляторы', href: '/calculators' },
+  { name: 'О компании', href: '/about' },
   { name: 'Блог', href: '/blog' },
-  { name: 'Контакты', href: '/contacts' },
+  { name: 'Контакты', href: '/#contacts' },
 ]
 
 export function Navbar() {

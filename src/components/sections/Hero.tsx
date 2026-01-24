@@ -26,11 +26,11 @@ export function Hero() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
         <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 uppercase">
-              ВСЕ БУХГАЛТЕРСКИЕ <span className="text-primary">СЕРВИСЫ</span> В ОДНОМ МЕСТЕ
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-7xl mb-6 uppercase leading-[0.9]">
+              ВАША БУХГАЛТЕРИЯ В <span className="text-primary">НАДЕЖНЫХ</span> РУКАХ
             </h1>
             <p className="text-xl leading-8 text-slate-600 mb-8 max-w-xl">
-              Профессиональное сопровождение вашего бизнеса в Казахстане. Мы берем на себя все заботы о бухгалтерии, чтобы вы могли сосредоточиться на росте.
+              Берем на себя учет и ответственность, чтобы вы спокойно развивали бизнес. Экспертное сопровождение ИП и ТОО в Казахстане с гарантией отсутствия штрафов.
             </p>
 
             <ul className="space-y-4 mb-10">
