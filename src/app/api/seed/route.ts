@@ -34,12 +34,14 @@ export async function GET() {
       success: true,
       message: 'Database initialized and seeded successfully. Admin: admin@buxtaxes.kz / admin-password-123'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Seed error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    const stack = error instanceof Error ? error.stack : undefined
     return NextResponse.json({
       success: false,
-      error: error.message,
-      stack: error.stack
+      error: message,
+      stack: stack
     }, { status: 500 })
   }
 }

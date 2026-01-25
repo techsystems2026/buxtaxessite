@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { Check, Info } from 'lucide-react'
@@ -7,7 +8,7 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function TariffsPage() {
-  let tariffs = []
+  let tariffs: any[] = []
   try {
     const payload = await getPayload({ config })
     const result = await payload.find({
@@ -51,7 +52,7 @@ export default async function TariffsPage() {
                       </div>
 
                       <ul className="space-y-4 mb-8 flex-grow">
-                        {tariff.features?.map((f: { feature?: string | null }, i: number) => (
+                        {(tariff.features as any[])?.map((f: { feature?: string | null }, i: number) => (
                           <li key={i} className="flex items-start gap-3 text-slate-600 text-sm">
                             <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
                             <span>{f.feature}</span>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,7 +14,7 @@ interface ServiceItem {
 }
 
 export async function ServicesOverview() {
-  let docs = []
+  let docs: any[] = []
   try {
     const payload = await getPayload({ config })
     const result = await payload.find({
