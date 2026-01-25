@@ -13,11 +13,17 @@ interface ServiceItem {
 }
 
 export async function ServicesOverview() {
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'services',
-    limit: 10,
-  })
+  let docs = []
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'services',
+      limit: 10,
+    })
+    docs = result.docs
+  } catch (error) {
+    console.error('Error fetching services:', error)
+  }
 
   // Fallback if no services in DB yet
   const displayServices = (docs.length > 0 ? docs : [

@@ -3,6 +3,8 @@ import { RootLayout } from '@payloadcms/next/layouts'
 import config from '@/payload.config'
 import React from 'react'
 
+export const dynamic = 'force-dynamic'
+
 type Args = {
   children: React.ReactNode
 }

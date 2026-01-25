@@ -7,11 +7,17 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function TariffsPage() {
-  const payload = await getPayload({ config })
-  const { docs: tariffs } = await payload.find({
-    collection: 'tariffs',
-    sort: 'price',
-  })
+  let tariffs = []
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'tariffs',
+      sort: 'price',
+    })
+    tariffs = result.docs
+  } catch (error) {
+    console.error('Error fetching tariffs:', error)
+  }
 
   const categories = [
     { id: 'IP', name: 'ИП' },

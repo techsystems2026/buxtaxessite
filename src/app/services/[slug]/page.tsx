@@ -19,18 +19,24 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'services',
-    where: { slug: { equals: slug } },
-  })
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'services',
+      where: { slug: { equals: slug } },
+    })
 
-  if (!docs.length) return {}
+    if (!docs.length) return {}
 
-  const service = docs[0]
-  return {
-    title: service.seo?.title || `${service.title} — BUX&TAXES`,
-    description: service.seo?.description || service.shortDescription,
+    const service = docs[0]
+    return {
+      title: service.seo?.title || `${service.title} — BUX&TAXES`,
+      description: service.seo?.description || service.shortDescription,
+    }
+  } catch (e) {
+    return {
+      title: 'Услуги — BUX&TAXES'
+    }
   }
 }
 
@@ -38,22 +44,30 @@ export const dynamic = 'force-dynamic'
 
 export default async function ServicePage({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let service: any = null
 
-  const { docs } = await payload.find({
-    collection: 'services',
-    where: {
-      slug: {
-        equals: slug,
+  try {
+    const payload = await getPayload({ config })
+
+    const { docs } = await payload.find({
+      collection: 'services',
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-  })
+    })
 
-  if (!docs.length) {
-    notFound()
+    if (docs.length > 0) {
+      service = docs[0]
+    }
+  } catch (error) {
+    console.error('Error fetching service:', error)
   }
 
-  const service = docs[0]
+  if (!service) {
+    notFound()
+  }
 
   const serviceJsonLd = {
     '@context': 'https://schema.org',

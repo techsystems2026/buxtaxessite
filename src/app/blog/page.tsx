@@ -16,12 +16,17 @@ interface BlogPost {
 export const dynamic = 'force-dynamic'
 
 export default async function BlogPage() {
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'blog',
-    sort: '-publishedAt',
-  })
-  const posts = docs as unknown as BlogPost[]
+  let posts: BlogPost[] = []
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'blog',
+      sort: '-publishedAt',
+    })
+    posts = docs as unknown as BlogPost[]
+  } catch (error) {
+    console.error('Error fetching blog posts:', error)
+  }
 
   return (
     <main className="bg-slate-50 py-24">

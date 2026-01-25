@@ -13,18 +13,24 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'blog',
-    where: { slug: { equals: slug } },
-  })
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'blog',
+      where: { slug: { equals: slug } },
+    })
 
-  if (!docs.length) return {}
+    if (!docs.length) return {}
 
-  const post = docs[0]
-  return {
-    title: post.seo?.title || `${post.title} — BUX&TAXES`,
-    description: post.seo?.description || post.excerpt,
+    const post = docs[0]
+    return {
+      title: post.seo?.title || `${post.title} — BUX&TAXES`,
+      description: post.seo?.description || post.excerpt,
+    }
+  } catch (e) {
+    return {
+      title: 'Блог — BUX&TAXES'
+    }
   }
 }
 
@@ -32,22 +38,30 @@ export const dynamic = 'force-dynamic'
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let post: any = null
 
-  const { docs } = await payload.find({
-    collection: 'blog',
-    where: {
-      slug: {
-        equals: slug,
+  try {
+    const payload = await getPayload({ config })
+
+    const { docs } = await payload.find({
+      collection: 'blog',
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-  })
+    })
 
-  if (!docs.length) {
-    notFound()
+    if (docs.length > 0) {
+      post = docs[0]
+    }
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
   }
 
-  const post = docs[0]
+  if (!post) {
+    notFound()
+  }
 
   const jsonLd = {
     '@context': 'https://schema.org',

@@ -5,17 +5,26 @@ import config from '@/payload.config'
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const payload = await getPayload({ config })
+  let services: any[] = []
+  let posts: any[] = []
 
-  const { docs: services } = await payload.find({
-    collection: 'services',
-    limit: 100,
-  })
+  try {
+    const payload = await getPayload({ config })
 
-  const { docs: posts } = await payload.find({
-    collection: 'blog',
-    limit: 100,
-  })
+    const servicesResult = await payload.find({
+      collection: 'services',
+      limit: 100,
+    })
+    services = servicesResult.docs
+
+    const postsResult = await payload.find({
+      collection: 'blog',
+      limit: 100,
+    })
+    posts = postsResult.docs
+  } catch (e) {
+    console.error('Sitemap generation error:', e)
+  }
 
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://buxtaxes.kz'
 
