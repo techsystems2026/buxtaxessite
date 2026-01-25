@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import Link from 'next/link'
@@ -11,7 +12,7 @@ interface NewsItem {
 }
 
 export async function LatestNews() {
-  let docs = []
+  let docs: any[] = []
   try {
     const payload = await getPayload({ config })
     const result = await payload.find({
