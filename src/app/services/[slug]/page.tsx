@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
@@ -19,18 +20,24 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'services',
-    where: { slug: { equals: slug } },
-  })
+  try {
+    const payload = await getPayload({ config })
+    const { docs } = await payload.find({
+      collection: 'services',
+      where: { slug: { equals: slug } },
+    })
 
-  if (!docs.length) return {}
+    if (!docs.length) return {}
 
-  const service = docs[0]
-  return {
-    title: service.seo?.title || `${service.title} — BUX&TAXES`,
-    description: service.seo?.description || service.shortDescription,
+    const service = docs[0]
+    return {
+      title: (service.seo as any)?.title || `${service.title} — BUX&TAXES`,
+      description: (service.seo as any)?.description || service.shortDescription,
+    }
+  } catch {
+    return {
+      title: 'Услуги — BUX&TAXES'
+    }
   }
 }
 
@@ -38,22 +45,30 @@ export const dynamic = 'force-dynamic'
 
 export default async function ServicePage({ params }: PageProps) {
   const { slug } = await params
-  const payload = await getPayload({ config })
+  let service: any = null
 
-  const { docs } = await payload.find({
-    collection: 'services',
-    where: {
-      slug: {
-        equals: slug,
+  try {
+    const payload = await getPayload({ config })
+
+    const { docs } = await payload.find({
+      collection: 'services',
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-  })
+    })
 
-  if (!docs.length) {
-    notFound()
+    if (docs.length > 0) {
+      service = docs[0]
+    }
+  } catch (error) {
+    console.error('Error fetching service:', error)
   }
 
-  const service = docs[0]
+  if (!service) {
+    notFound()
+  }
 
   const serviceJsonLd = {
     '@context': 'https://schema.org',
@@ -67,15 +82,15 @@ export default async function ServicePage({ params }: PageProps) {
     areaServed: 'KZ',
     offers: {
       '@type': 'Offer',
-      price: service.priceFrom?.replace(/[^0-9]/g, ''),
+      price: (service.priceFrom as string)?.replace(/[^0-9]/g, ''),
       priceCurrency: 'KZT',
     },
   }
 
-  const faqJsonLd = service.faq && service.faq.length > 0 ? {
+  const faqJsonLd = service.faq && (service.faq as any[]).length > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: service.faq.map((item: { question?: string | null, answer?: string | null }) => ({
+    mainEntity: (service.faq as any[]).map((item: { question?: string | null, answer?: string | null }) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {
@@ -121,7 +136,7 @@ export default async function ServicePage({ params }: PageProps) {
             <div className="lg:col-span-2">
               <div className="prose prose-lg max-w-none">
                 {service.fullDescription ? (
-                  <RichText content={service.fullDescription} />
+                  <RichText content={service.fullDescription as any} />
                 ) : (
                   <div className="text-slate-600">
                     <p>Профессиональное решение для вашего бизнеса. Мы обеспечиваем полное соответствие законодательству РК и берем на себя все сложности взаимодействия с налоговыми органами.</p>
@@ -129,11 +144,11 @@ export default async function ServicePage({ params }: PageProps) {
                 )}
               </div>
 
-              {service.whatIsIncluded && service.whatIsIncluded.length > 0 && (
+              {service.whatIsIncluded && (service.whatIsIncluded as any[]).length > 0 && (
                 <div className="mt-16">
                   <h2 className="text-2xl font-bold text-slate-900 mb-8">Что входит в услугу</h2>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {service.whatIsIncluded.map((item: { item?: string | null }, index: number) => (
+                    {(service.whatIsIncluded as any[]).map((item: { item?: string | null }, index: number) => (
                       <li key={index} className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
                         <span className="text-slate-700">{item.item}</span>
@@ -143,11 +158,11 @@ export default async function ServicePage({ params }: PageProps) {
                 </div>
               )}
 
-              {service.reports && service.reports.length > 0 && (
+              {service.reports && (service.reports as any[]).length > 0 && (
                 <div className="mt-16">
                   <h2 className="text-2xl font-bold text-slate-900 mb-8">Какие отчеты мы сдаем</h2>
                   <div className="flex flex-wrap gap-3">
-                    {service.reports.map((report: { report?: string | null }, index: number) => (
+                    {(service.reports as any[]).map((report: { report?: string | null }, index: number) => (
                       <span key={index} className="px-4 py-2 bg-primary/5 text-primary font-medium rounded-full border border-primary/10">
                         {report.report}
                       </span>
@@ -159,6 +174,17 @@ export default async function ServicePage({ params }: PageProps) {
 
             <aside className="space-y-8">
               <div className="bg-slate-900 rounded-3xl p-8 text-white sticky top-24">
+                {service.whoLeadsAccount && (
+                  <div className="mb-8 pb-8 border-b border-slate-800">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Кто ведет учет</h3>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-xl font-bold">
+                        {(service.whoLeadsAccount as string).charAt(0)}
+                      </div>
+                      <div className="font-bold text-lg">{service.whoLeadsAccount}</div>
+                    </div>
+                  </div>
+                )}
                 <h3 className="text-xl font-bold mb-4">Стоимость услуги</h3>
                 <div className="text-4xl font-bold text-primary mb-2">
                   {service.priceFrom}
@@ -187,7 +213,7 @@ export default async function ServicePage({ params }: PageProps) {
       </section>
 
       {/* FAQ Section */}
-      {service.faq && service.faq.length > 0 && (
+      {service.faq && (service.faq as any[]).length > 0 && (
         <section className="bg-slate-50 py-16 lg:py-24">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="max-w-3xl">
@@ -196,7 +222,7 @@ export default async function ServicePage({ params }: PageProps) {
                 Частые вопросы по услуге
               </h2>
               <Accordion type="single" collapsible className="w-full space-y-4">
-                {service.faq.map((item: { question?: string | null, answer?: string | null }, index: number) => (
+                {(service.faq as any[]).map((item: { question?: string | null, answer?: string | null }, index: number) => (
                   <AccordionItem
                     key={index}
                     value={`item-${index}`}

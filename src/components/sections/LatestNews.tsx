@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import Link from 'next/link'
@@ -11,12 +12,18 @@ interface NewsItem {
 }
 
 export async function LatestNews() {
-  const payload = await getPayload({ config })
-  const { docs } = await payload.find({
-    collection: 'blog',
-    limit: 3,
-    sort: '-publishedAt',
-  })
+  let docs: any[] = []
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'blog',
+      limit: 3,
+      sort: '-publishedAt',
+    })
+    docs = result.docs
+  } catch (error) {
+    console.error('Error fetching news:', error)
+  }
 
   // Fallback
   const displayNews = (docs.length > 0 ? docs : [

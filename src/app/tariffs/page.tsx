@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { Check, Info } from 'lucide-react'
@@ -7,11 +8,17 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function TariffsPage() {
-  const payload = await getPayload({ config })
-  const { docs: tariffs } = await payload.find({
-    collection: 'tariffs',
-    sort: 'price',
-  })
+  let tariffs: any[] = []
+  try {
+    const payload = await getPayload({ config })
+    const result = await payload.find({
+      collection: 'tariffs',
+      sort: 'price',
+    })
+    tariffs = result.docs
+  } catch (error) {
+    console.error('Error fetching tariffs:', error)
+  }
 
   const categories = [
     { id: 'IP', name: 'ИП' },
@@ -45,7 +52,7 @@ export default async function TariffsPage() {
                       </div>
 
                       <ul className="space-y-4 mb-8 flex-grow">
-                        {tariff.features?.map((f: { feature?: string | null }, i: number) => (
+                        {(tariff.features as any[])?.map((f: { feature?: string | null }, i: number) => (
                           <li key={i} className="flex items-start gap-3 text-slate-600 text-sm">
                             <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
                             <span>{f.feature}</span>

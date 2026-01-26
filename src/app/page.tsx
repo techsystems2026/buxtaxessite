@@ -9,11 +9,12 @@ import { Contacts } from '@/components/sections/Contacts'
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
+  const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://buxtaxes.kz'
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'BUX&TAXES',
-    url: 'https://buxtaxes.kz',
+    url: siteUrl,
   }
 
   return (

@@ -2,6 +2,8 @@
 import { RootPage } from '@payloadcms/next/views'
 import config from '@/payload.config'
 
+export const dynamic = 'force-dynamic'
+
 type Args = {
   params: Promise<{
     payload: string[]
@@ -21,6 +23,6 @@ export default async function Page({ params, searchParams }: Args) {
     config,
     importMap: {},
     params: payloadParams,
-    searchParams
+    searchParams: await searchParams
   } as any)
 }
