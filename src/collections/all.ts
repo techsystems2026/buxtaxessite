@@ -68,6 +68,43 @@ export const Tariffs: CollectionConfig = {
   ],
 }
 
+export const Categories: CollectionConfig = {
+  slug: 'categories',
+  admin: {
+    useAsTitle: 'name',
+  },
+  access: {
+    read: () => true,
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'slug', type: 'text', required: true, unique: true },
+  ],
+}
+
+export const Media: CollectionConfig = {
+  slug: 'media',
+  upload: {
+    staticDir: 'media',
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 400,
+        height: 300,
+        position: 'centre',
+      },
+    ],
+    adminThumbnail: 'thumbnail',
+    mimeTypes: ['image/*'],
+  },
+  access: {
+    read: () => true,
+  },
+  fields: [
+    { name: 'alt', type: 'text' },
+  ],
+}
+
 export const Blog: CollectionConfig = {
   slug: 'blog',
   admin: {
@@ -79,8 +116,23 @@ export const Blog: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'categories',
+      required: false, // Changed from true to allow migration for existing posts
+      admin: {
+        position: 'sidebar',
+      }
+    },
+    {
+      name: 'tags',
+      type: 'array',
+      fields: [{ name: 'tag', type: 'text' }]
+    },
     { name: 'excerpt', type: 'textarea' },
     { name: 'content', type: 'richText', required: true },
+    { name: 'coverImage', type: 'upload', relationTo: 'media' },
     { name: 'publishedAt', type: 'date', defaultValue: () => new Date() },
     {
       name: 'seo',

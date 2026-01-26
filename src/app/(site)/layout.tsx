@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "sonner";
@@ -20,12 +20,15 @@ export const metadata: Metadata = {
   description: "Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.",
 };
 
+import { StatsBar } from "@/components/ui/StatsBar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://buxtaxes.kz'
+  // ... (jsonLd code omitted for brevity as it is unchanged) ...
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -58,6 +61,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${manrope.variable} font-manrope antialiased flex flex-col min-h-screen`}
       >
+        <StatsBar />
         <Navbar />
         <main className="flex-grow">
           {children}

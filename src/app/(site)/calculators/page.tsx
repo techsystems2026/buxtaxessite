@@ -21,11 +21,11 @@ export default function CalculatorsPage() {
     },
     {
       title: 'Калькулятор налогов ТОО',
-      description: 'Предварительный расчет налоговой нагрузки для товариществ (в разработке).',
-      href: '/#contacts',
+      description: 'Предварительный расчет налоговой нагрузки для товариществ (Упрощенка / ОУР).',
+      href: '/calculators/tax-too',
       icon: Calculator,
       color: 'bg-purple-500',
-      disabled: true
+      disabled: false
     }
   ]
 
@@ -75,29 +75,29 @@ export default function CalculatorsPage() {
               </Button>
             </div>
             <div className="hidden lg:block">
-               <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary font-bold">BT</div>
-                    <div>
-                      <div className="font-bold text-lg">Bux & Taxes Expert</div>
-                      <div className="text-blue-200 text-sm">Гарантия точности</div>
-                    </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary font-bold">BT</div>
+                  <div>
+                    <div className="font-bold text-lg">Bux & Taxes Expert</div>
+                    <div className="text-blue-200 text-sm">Гарантия точности</div>
                   </div>
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                      <span>Учет всех льгот и вычетов</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                      <span>Анализ рисков по СУР</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                      <span>Оптимизация налоговой базы</span>
-                    </li>
-                  </ul>
-               </div>
+                </div>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                    <span>Учет всех льгот и вычетов</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                    <span>Анализ рисков по СУР</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                    <span>Оптимизация налоговой базы</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl" />

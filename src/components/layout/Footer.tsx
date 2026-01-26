@@ -37,7 +37,7 @@ export function Footer() {
                 <h3 className="text-sm font-semibold leading-6 text-white">Контакты</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li className="text-sm leading-6 text-gray-300">Алматы, пр. Аль-Фараби 17</li>
-                  <li className="text-sm leading-6 text-gray-300">+7 (777) 123-45-67</li>
+                  <li className="text-sm leading-6 text-gray-300 whitespace-nowrap">+7 (777) 123-45-67</li>
                   <li className="text-sm leading-6 text-gray-300">info@buxtaxes.kz</li>
                 </ul>
               </div>

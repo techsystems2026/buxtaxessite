@@ -6,6 +6,8 @@ import { FAQ } from '@/components/sections/FAQ'
 import { Clients } from '@/components/sections/Clients'
 import { Contacts } from '@/components/sections/Contacts'
 
+import { ToolsPreview } from '@/components/sections/ToolsPreview'
+
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
@@ -24,6 +26,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
+      <ToolsPreview />
       <ServicesOverview />
       <LatestNews />
       <Quiz />

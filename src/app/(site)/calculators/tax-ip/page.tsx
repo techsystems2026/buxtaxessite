@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Calculator as CalcIcon, Info, RefreshCw, Download, Mail } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Calculator as CalcIcon, Info, RefreshCw, Download, Mail, History, ArrowRight, Trash2 } from 'lucide-react'
+import { useCalculationHistory } from '@/hooks/useCalculationHistory'
+import { PrintResults } from '@/components/ui/PrintResults'
+import { TAX_CONSTANTS, type TaxYear } from '@/lib/tax-constants'
 import Link from 'next/link'
 
 interface TaxResults {
@@ -19,18 +23,22 @@ interface TaxResults {
   totalFixed: number
   totalToPay: number
   netIncome: number
+  rate: number
 }
 
 export default function IPTaxCalculatorPage() {
   const [revenue, setRevenue] = useState<number>(0)
+  const [year, setYear] = useState<TaxYear>(2025)
   const [results, setResults] = useState<TaxResults | null>(null)
   const [emailLoading, setEmailLoading] = useState(false)
+
+  const { history, saveToHistory, clearHistory } = useCalculationHistory<number>('calc_history_ip')
 
   const sendEmail = async () => {
     if (!results) return
     setEmailLoading(true)
     try {
-      const message = `Расчет налогов ИП (2025):
+      const message = `Расчет налогов ИП (${year}):
 Доход: ${revenue} ₸
 К уплате всего: ${results.totalToPay} ₸
 ИПН: ${results.ipn} ₸
@@ -49,7 +57,7 @@ export default function IPTaxCalculatorPage() {
       })
 
       if (response.ok) {
-        alert('Запрос на отправку результатов принят! Мы вышлем расчет на вашу почту (укажите её в форме контактов ниже для связи).')
+        alert('Запрос на отправку результатов принят! Мы вышлем расчет на вашу почту.')
       }
     } catch {
       alert('Ошибка при отправке.')
@@ -61,17 +69,20 @@ export default function IPTaxCalculatorPage() {
   const calculate = () => {
     if (revenue < 0) return
 
-    // Standard Simplified Regime (Упрощенка)
-    // 3% total tax
-    const totalTax = revenue * 0.03
+    const constants = TAX_CONSTANTS[year]
+
+    // Simplified Regime (Упрощенка)
+    // Rate depends on year (3% or 4%)
+    const rate = constants.SIMPLIFIED_TAX_RATE
+    const totalTax = revenue * rate
     const ipn = totalTax / 2
     const socialTax = totalTax / 2
 
-    // Fixed contributions for owner (2025 constants)
-    const mzp = 85000
-    const opv = mzp * 0.10 // 8500
-    const so = mzp * 0.035 // 2975
-    const vosms = 5950 // Still fixed for 2025 unless changed
+    // Fixed contributions for owner
+    const mzp = constants.MZP
+    const opv = mzp * 0.10 // 10% from MZP
+    const so = mzp * 0.035 // 3.5% from MZP
+    const vosms = 1.4 * mzp * 0.05 // 5% from 1.4 MZP
 
     const totalFixed = opv + so + vosms
 
@@ -82,7 +93,7 @@ export default function IPTaxCalculatorPage() {
     const totalToPay = ipn + finalSocialTax + totalFixed
     const netIncome = revenue - totalToPay
 
-    setResults({
+    const newResults = {
       revenue,
       ipn,
       socialTax,
@@ -92,8 +103,18 @@ export default function IPTaxCalculatorPage() {
       vosms,
       totalFixed,
       totalToPay,
-      netIncome
-    })
+      netIncome,
+      rate
+    }
+
+    setResults(newResults)
+    saveToHistory(`Доход ${revenue.toLocaleString()} ₸ (${year})`, revenue, newResults)
+  }
+
+  const loadFromHistory = (item: any) => {
+    setRevenue(item.inputs)
+    setResults(item.results)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -101,7 +122,7 @@ export default function IPTaxCalculatorPage() {
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4 uppercase">КАЛЬКУЛЯТОР НАЛОГОВ ИП</h1>
-          <p className="text-xl text-slate-600">Рассчитайте налоги ИП на упрощенном режиме (3%) за полугодие или месяц.</p>
+          <p className="text-xl text-slate-600">Рассчитайте налоги ИП на упрощенном режиме за полугодие или месяц.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -113,6 +134,19 @@ export default function IPTaxCalculatorPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Год расчета</Label>
+                <Select value={year.toString()} onValueChange={(v) => setYear(Number(v) as TaxYear)}>
+                  <SelectTrigger className="h-14 text-lg rounded-xl">
+                    <SelectValue placeholder="Выберите год" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2025">2025 год (3%)</SelectItem>
+                    <SelectItem value="2026">2026 год (4%)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="revenue">Ваш доход (выручка) за период</Label>
                 <div className="relative">
@@ -133,8 +167,8 @@ export default function IPTaxCalculatorPage() {
               <div className="p-4 bg-primary/5 rounded-xl flex gap-3 text-sm text-slate-600">
                 <Info className="w-5 h-5 text-primary flex-shrink-0" />
                 <div>
-                  <p className="font-bold mb-1">Режим: Упрощенка</p>
-                  <p>Расчет включает 3% налога и минимальные обязательные отчисления за самого ИП.</p>
+                  <p className="font-bold mb-1">Режим: Упрощенка ({year})</p>
+                  <p>Расчет: {year === 2025 ? '3%' : '4%'} с оборота. Минимальные отчисления за ИП включены.</p>
                 </div>
               </div>
             </CardContent>
@@ -158,9 +192,9 @@ export default function IPTaxCalculatorPage() {
                   </div>
 
                   <div className="space-y-3 pt-6 border-t border-slate-800">
-                    <div className="text-sm font-bold text-slate-300">Налоги (3%)</div>
+                    <div className="text-sm font-bold text-slate-300">Налоги ({(results.rate * 100).toFixed(0)}%)</div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">ИПН (1.5%)</span>
+                      <span className="text-slate-400">ИПН ({results.rate * 50}%)</span>
                       <span className="font-medium">{Math.round(results.ipn).toLocaleString()} ₸</span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -195,6 +229,35 @@ export default function IPTaxCalculatorPage() {
           </Card>
         </div>
 
+        {/* История расчетов */}
+        {history.length > 0 && (
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <History className="w-6 h-6 text-slate-400" />
+                История расчетов
+              </h3>
+              <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={clearHistory}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Очистить
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {history.map((item) => (
+                <div key={item.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => loadFromHistory(item)}>
+                  <div className="text-xs text-slate-400 mb-2">{new Date(item.date).toLocaleString()}</div>
+                  <div className="font-bold text-lg mb-1">{Math.round(item.results.totalToPay).toLocaleString()} ₸</div>
+                  <div className="text-sm text-slate-500 mb-4">{item.title}</div>
+                  <div className="flex items-center text-primary text-sm font-bold group-hover:gap-2 transition-all">
+                    Загрузить <ArrowRight className="w-4 h-4 ml-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {results && (
           <div className="mt-12 bg-white rounded-[2rem] p-8 lg:p-12 shadow-lg border border-slate-100 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="max-w-xl">
@@ -215,6 +278,23 @@ export default function IPTaxCalculatorPage() {
               </Button>
             </div>
           </div>
+        )}
+
+        {/* Print Layout */}
+        {results && (
+          <PrintResults
+            title={`Расчет налогов ИП (Упрощенка ${year})`}
+            items={[
+              { label: 'Доход за период', value: results.revenue },
+              { label: `ИПН (${results.rate * 50}%)`, value: results.ipn },
+              { label: `Соц. налог (${results.rate * 50}% минус СО)`, value: results.finalSocialTax },
+              { label: 'ОПВ (Пенсионные)', value: results.opv },
+              { label: 'СО (Социальные)', value: results.so },
+              { label: 'ВОСМС (Мед. страхование)', value: results.vosms },
+              { label: 'ИТОГО К УПЛАТЕ', value: results.totalToPay, isTotal: true, highlight: true },
+              { label: 'Чистая прибыль', value: results.netIncome, isTotal: true }
+            ]}
+          />
         )}
       </div>
     </main>
