@@ -329,6 +329,25 @@ const seed = async () => {
     }
   }
 
+  console.log('Seeding admin user...')
+  const existingUsers = await payload.find({
+    collection: 'users',
+    limit: 1,
+  })
+
+  if (existingUsers.totalDocs === 0) {
+    await payload.create({
+      collection: 'users',
+      data: {
+        email: 'admin@example.com',
+        password: 'admin',
+      },
+    })
+    console.log('Admin user created: admin@example.com / admin')
+  } else {
+    console.log('Admin user already exists.')
+  }
+
   console.log('Seed completed successfully.')
 }
 

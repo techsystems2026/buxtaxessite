@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Calculator as CalcIcon, Download, RefreshCw, Info, Mail, Settings2 } from 'lucide-react'
+import { Download, RefreshCw, Mail, Settings2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TAX_CONSTANTS, type TaxYear } from '@/lib/tax-constants'
 import { PrintResults } from '@/components/ui/PrintResults'
@@ -21,19 +20,11 @@ export default function SalaryCalculatorPage() {
   const [method, setMethod] = useState<CalculationMethod>('gross')
   const [category, setCategory] = useState<EmployeeCategory>('employee')
   const [hasDeduction, setHasDeduction] = useState<boolean>(true)
-  const [isResident, setIsResident] = useState<boolean>(true)
 
   const [results, setResults] = useState<SalaryResults | null>(null)
   const [emailLoading, setEmailLoading] = useState(false)
 
-  // Auto-calculate on changes if amount is present
-  useEffect(() => {
-    if (amount > 0) {
-      handleCalculate()
-    }
-  }, [year, method, category, hasDeduction, isResident])
-
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
     if (amount < 0) return
 
     const inputs: SalaryInputs = {
@@ -42,12 +33,19 @@ export default function SalaryCalculatorPage() {
       method,
       category,
       hasDeduction,
-      isResident
+      isResident: true
     }
 
     const res = calculateSalary(inputs)
     setResults(res)
-  }
+  }, [amount, year, method, category, hasDeduction])
+
+  // Auto-calculate on changes if amount is present
+  useEffect(() => {
+    if (amount > 0) {
+      handleCalculate()
+    }
+  }, [amount, handleCalculate])
 
   const sendEmail = async () => {
     if (!results) return
@@ -157,7 +155,7 @@ export default function SalaryCalculatorPage() {
 
                 {category !== 'gph' && (
                   <div className="flex items-center space-x-2 border p-3 rounded-lg bg-slate-50/50">
-                    <Checkbox id="deduction" checked={hasDeduction} onCheckedChange={(c) => setHasDeduction(!!c)} />
+                    <Checkbox id="deduction" checked={hasDeduction} onCheckedChange={(c: boolean) => setHasDeduction(!!c)} />
                     <label
                       htmlFor="deduction"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -291,8 +289,8 @@ export default function SalaryCalculatorPage() {
               { label: 'ОПВР (Взносы)', value: results.opvm },
             ]}
             footerText={`Расчет произведен для категории: ${category === 'employee' ? 'Штатный сотрудник' :
-                category === 'pensioner' ? 'Пенсионер' :
-                  category === 'disabled' ? 'Лицо с инвалидностью' : 'Договор ГПХ'
+              category === 'pensioner' ? 'Пенсионер' :
+                category === 'disabled' ? 'Лицо с инвалидностью' : 'Договор ГПХ'
               }. ${hasDeduction ? `С применением вычета ${TAX_CONSTANTS[year].IPN_DEDUCTION_MRP} МРП.` : 'Без стандартного вычета.'}`}
           />
         )}

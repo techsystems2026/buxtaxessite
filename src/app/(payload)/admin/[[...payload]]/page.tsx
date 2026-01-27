@@ -2,6 +2,8 @@
 import { RootPage } from '@payloadcms/next/views'
 import config from '@/payload.config'
 
+import { importMap } from '../importMap'
+
 export const dynamic = 'force-dynamic'
 
 type Args = {
@@ -13,16 +15,14 @@ type Args = {
   }>
 }
 
-export default async function Page({ params, searchParams }: Args) {
-  const resolvedParams = await params
-  const payloadParams = Promise.resolve({
-    segments: resolvedParams.payload || []
-  })
+export default async function Page(props: Args) {
+  const params = await props.params
+  const searchParams = await props.searchParams
 
   return RootPage({
     config,
-    importMap: {},
-    params: payloadParams,
-    searchParams: await searchParams
+    importMap,
+    params,
+    searchParams,
   } as any)
 }

@@ -20,7 +20,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI || 'postgres://postgres:postgres@localhost:5432/payload',
+      connectionString: process.env.DATABASE_URI,
     },
   }),
   editor: lexicalEditor({}),

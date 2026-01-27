@@ -182,7 +182,10 @@ export const Leads: CollectionConfig = {
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: true,
+  auth: {
+    maxLoginAttempts: 100,
+    lockTime: 1000,
+  },
   admin: {
     useAsTitle: 'email',
   },

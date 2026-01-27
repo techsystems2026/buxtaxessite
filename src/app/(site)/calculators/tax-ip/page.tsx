@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calculator as CalcIcon, Info, RefreshCw, Download, Mail, History, ArrowRight, Trash2 } from 'lucide-react'
-import { useCalculationHistory } from '@/hooks/useCalculationHistory'
+import { useCalculationHistory, type HistoryItem } from '@/hooks/useCalculationHistory'
 import { PrintResults } from '@/components/ui/PrintResults'
 import { TAX_CONSTANTS, type TaxYear } from '@/lib/tax-constants'
 import Link from 'next/link'
@@ -111,7 +111,7 @@ export default function IPTaxCalculatorPage() {
     saveToHistory(`Доход ${revenue.toLocaleString()} ₸ (${year})`, revenue, newResults)
   }
 
-  const loadFromHistory = (item: any) => {
+  const loadFromHistory = (item: HistoryItem<number, TaxResults>) => {
     setRevenue(item.inputs)
     setResults(item.results)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -245,9 +245,9 @@ export default function IPTaxCalculatorPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {history.map((item) => (
-                <div key={item.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => loadFromHistory(item)}>
+                <div key={item.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow group cursor-pointer" onClick={() => loadFromHistory(item as HistoryItem<number, TaxResults>)}>
                   <div className="text-xs text-slate-400 mb-2">{new Date(item.date).toLocaleString()}</div>
-                  <div className="font-bold text-lg mb-1">{Math.round(item.results.totalToPay).toLocaleString()} ₸</div>
+                  <div className="font-bold text-lg mb-1">{Math.round((item.results as TaxResults).totalToPay).toLocaleString()} ₸</div>
                   <div className="text-sm text-slate-500 mb-4">{item.title}</div>
                   <div className="flex items-center text-primary text-sm font-bold group-hover:gap-2 transition-all">
                     Загрузить <ArrowRight className="w-4 h-4 ml-1" />

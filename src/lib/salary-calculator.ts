@@ -49,7 +49,7 @@ export function calculateSalary(inputs: SalaryInputs): SalaryResults {
 }
 
 function calculateDirect(grossAmount: number, inputs: SalaryInputs): SalaryResults {
-    const { year, category, hasDeduction, isResident } = inputs
+    const { year, category, hasDeduction } = inputs
     const K = TAX_CONSTANTS[year]
     const MRP = K.MRP
     const MZP = K.MZP

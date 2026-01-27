@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Calculator as CalcIcon, Info, RefreshCw, Download, Mail, Building2, History, ArrowRight, Trash2 } from 'lucide-react'
+import { RefreshCw, Download, Mail, Building2, History, ArrowRight, Trash2 } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useCalculationHistory } from '@/hooks/useCalculationHistory'
+import { useCalculationHistory, type HistoryItem } from '@/hooks/useCalculationHistory'
 import { PrintResults } from '@/components/ui/PrintResults'
 import { TAX_CONSTANTS, type TaxYear } from '@/lib/tax-constants'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -37,7 +37,7 @@ export default function TOOTaxCalculatorPage() {
     const [results, setResults] = useState<TOOResults | null>(null)
     const [emailLoading, setEmailLoading] = useState(false)
 
-    const { history, saveToHistory, clearHistory } = useCalculationHistory<TOOInputs>('calc_history_too')
+    const { history, saveToHistory, clearHistory } = useCalculationHistory<TOOInputs, TOOResults>('calc_history_too')
 
     const sendEmail = async () => {
         if (!results) return
@@ -144,8 +144,8 @@ ${results.vat ? `НДС: ${results.vat} ₸` : ''}
         saveToHistory(title, inputs, newResults)
     }
 
-    const loadFromHistory = (item: any) => {
-        const inputs = item.inputs as TOOInputs
+    const loadFromHistory = (item: HistoryItem<TOOInputs, TOOResults>) => {
+        const inputs = item.inputs
         setRevenue(inputs.revenue)
         setExpenses(inputs.expenses)
         setRegime(inputs.regime)
