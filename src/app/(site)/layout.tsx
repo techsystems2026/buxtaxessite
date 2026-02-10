@@ -4,6 +4,8 @@ import "../globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "sonner";
+import { getPayload } from "payload";
+import config from "@/payload.config";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -15,20 +17,45 @@ const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
 });
 
-export const metadata: Metadata = {
-  title: "BUX&TAXES — бухгалтерия для ИП и ТОО в Казахстане",
-  description: "Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const payload = await getPayload({ config })
+    const siteSettings = await payload.findGlobal({
+      slug: 'siteSettings',
+    })
 
-import { StatsBar } from "@/components/ui/StatsBar";
+    return {
+      title: (siteSettings as any).siteName || "BUX&TAXES — бухгалтерия для ИП и ТОО в Казахстане",
+      description: (siteSettings as any).siteDescription || "Ведём учёт, налоги, ЭСФ и СНТ.",
+    }
+  } catch {
+    return {
+      title: "BUX&TAXES — бухгалтерия для ИП и ТОО в Казахстане",
+      description: "Ведём учёт, налоги, ЭСФ и СНТ.",
+    }
+  }
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://buxtaxes.kz'
-  // ... (jsonLd code omitted for brevity as it is unchanged) ...
+
+  let siteSettings: any = null
+  try {
+    const payload = await getPayload({ config })
+    siteSettings = await payload.findGlobal({
+      slug: 'siteSettings',
+    })
+  } catch {
+    // Use defaults if globals not available
+  }
+
+  const phone = (siteSettings as any)?.phone || '+7 (777) 123-45-67'
+  const address = (siteSettings as any)?.address || 'г. Алматы'
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -37,14 +64,14 @@ export default function RootLayout({
     logo: `${siteUrl}/logo.png`,
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+7-777-123-4567',
+      telephone: phone.replace(/\s/g, ''),
       contactType: 'customer service',
       areaServed: 'KZ',
       availableLanguage: ['Russian', 'Kazakh'],
     },
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'пр. Аль-Фараби 17, БЦ Нурлы Тау',
+      streetAddress: address,
       addressLocality: 'Алматы',
       addressCountry: 'KZ',
     },
@@ -61,7 +88,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${manrope.variable} font-manrope antialiased flex flex-col min-h-screen`}
       >
-        <StatsBar />
         <Navbar />
         <main className="flex-grow">
           {children}

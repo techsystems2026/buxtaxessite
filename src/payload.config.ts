@@ -4,7 +4,8 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media } from './collections/all'
+import { Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media, Clients, Pages } from './collections'
+import { SiteSettings, Navigation, FooterConfig } from './globals'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -13,7 +14,8 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media],
+  collections: [Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media, Clients, Pages],
+  globals: [SiteSettings, Navigation, FooterConfig],
   secret: process.env.PAYLOAD_SECRET || 'YOUR_SECRET_HERE',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

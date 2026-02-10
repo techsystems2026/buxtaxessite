@@ -5,17 +5,54 @@ import Link from 'next/link'
 import { Menu, X, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const navigation = [
-  { name: 'Услуги', href: '/#services' },
-  { name: 'Тарифы', href: '/tariffs' },
-  { name: 'Калькуляторы', href: '/calculators' },
-  { name: 'О компании', href: '/about' },
-  { name: 'Блог', href: '/blog' },
-  { name: 'Контакты', href: '/#contacts' },
-]
+interface NavItem {
+  label: string
+  href: string
+}
+
+interface NavData {
+  items: NavItem[]
+  ctaButton: {
+    text: string
+    href: string
+  }
+  phone: string
+}
+
+const defaultNav: NavData = {
+  items: [
+    { label: 'Услуги', href: '/#services' },
+    { label: 'Тарифы', href: '/tariffs' },
+    { label: 'Калькуляторы', href: '/calculators' },
+    { label: 'О компании', href: '/about' },
+    { label: 'Блог', href: '/blog' },
+    { label: 'Контакты', href: '/contacts' },
+  ],
+  ctaButton: { text: 'Заказать звонок', href: '/contacts' },
+  phone: '+7 (777) 123-45-67',
+}
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const [navData, setNavData] = React.useState<NavData>(defaultNav)
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const fetchNav = async () => {
+      try {
+        const res = await fetch('/api/navigation')
+        if (res.ok) {
+          const data = await res.json()
+          setNavData(data)
+        }
+      } catch (error) {
+        console.error('Error fetching navigation:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchNav()
+  }, [])
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -35,19 +72,19 @@ export function Navbar() {
           </button>
         </div>
         <div className="hidden lg:flex lg:gap-x-12">
-          {navigation.map((item) => (
-            <Link key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors">
-              {item.name}
+          {navData.items.map((item) => (
+            <Link key={item.label} href={item.href} className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors">
+              {item.label}
             </Link>
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-4 items-center">
-          <a href="tel:+77771234567" className="text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+          <a href={`tel:${navData.phone.replace(/\s/g, '')}`} className="text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
             <Phone className="h-4 w-4 text-primary" />
-            +7 (777) 123-45-67
+            {navData.phone}
           </a>
           <Button asChild>
-            <Link href="/contacts">Заказать звонок</Link>
+            <Link href={navData.ctaButton.href}>{navData.ctaButton.text}</Link>
           </Button>
         </div>
       </nav>
@@ -68,20 +105,22 @@ export function Navbar() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation.map((item) => (
+                {navData.items.map((item) => (
                   <Link
-                    key={item.name}
+                    key={item.label}
                     href={item.href}
                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-foreground hover:bg-gray-50"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {item.name}
+                    {item.label}
                   </Link>
                 ))}
               </div>
               <div className="py-6">
                 <Button className="w-full" asChild>
-                  <Link href="/contacts" onClick={() => setMobileMenuOpen(false)}>Бесплатная консультация</Link>
+                  <Link href={navData.ctaButton.href} onClick={() => setMobileMenuOpen(false)}>
+                    {navData.ctaButton.text}
+                  </Link>
                 </Button>
               </div>
             </div>

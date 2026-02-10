@@ -5,180 +5,220 @@ import config from './src/payload.config'
 const seed = async () => {
   const payload = await getPayload({ config })
 
+  console.log('Seeding globals...')
+
+  // Seed SiteSettings
+  const siteSettingsExists = await payload.findGlobal({
+    slug: 'siteSettings',
+  }).catch(() => null)
+
+  if (!siteSettingsExists) {
+    await payload.updateGlobal({
+      slug: 'siteSettings',
+      data: {
+        siteName: 'BUX&TAXES',
+        siteDescription: 'Профессиональная бухгалтерия для ИП и ТОО в Казахстане',
+        phone: '+7 (707) 123-45-67',
+        email: 'info@buxtaxes.kz',
+        address: 'г. Алматы, ул. Абая 123, офис 456',
+        workingHours: 'Пн-Пт: 09:00 - 18:00',
+        socialLinks: {
+          instagram: 'https://instagram.com/buxtaxes',
+          telegram: 'https://t.me/buxtaxes',
+          whatsapp: 'https://wa.me/77071234567',
+        },
+        statsBar: {
+          enabled: true,
+          items: [
+            { label: 'Лет на рынке', value: '5+' },
+            { label: 'Клиентов', value: '500+' },
+            { label: 'Лет гарантии', value: '3' },
+          ],
+        },
+      },
+    })
+    console.log('SiteSettings created')
+  }
+
+  // Seed Navigation
+  const navExists = await payload.findGlobal({
+    slug: 'navigation',
+  }).catch(() => null)
+
+  if (!navExists) {
+    await payload.updateGlobal({
+      slug: 'navigation',
+      data: {
+        items: [
+          { label: 'Услуги', href: '/#services', type: 'link' },
+          { label: 'Тарифы', href: '/#tariffs', type: 'link' },
+          { label: 'Блог', href: '/blog', type: 'link' },
+          { label: 'Калькуляторы', href: '/calculators', type: 'link' },
+          { label: 'Контакты', href: '/contacts', type: 'link' },
+        ],
+        ctaButton: {
+          text: 'Получить консультацию',
+          href: '/contacts',
+        },
+      },
+    })
+    console.log('Navigation created')
+  }
+
+  // Seed FooterConfig
+  const footerExists = await payload.findGlobal({
+    slug: 'footerConfig',
+  }).catch(() => null)
+
+  if (!footerExists) {
+    await payload.updateGlobal({
+      slug: 'footerConfig',
+      data: {
+        description: 'Профессиональное бухгалтерское сопровождение ИП и ТОО в Казахстане. Берем на себя отчёты и общение с налоговой.',
+        linkColumns: [
+          {
+            title: 'Услуги',
+            links: [
+              { label: 'ИП', href: '/services/ip-bookkeeping' },
+              { label: 'ТОО', href: '/services/too-bookkeeping' },
+              { label: 'Отчетность', href: '/services/tax-reporting' },
+              { label: 'Восстановление', href: '/services/recovery' },
+            ],
+          },
+          {
+            title: 'Информация',
+            links: [
+              { label: 'О нас', href: '/about' },
+              { label: 'Блог', href: '/blog' },
+              { label: 'Калькуляторы', href: '/calculators' },
+              { label: 'Контакты', href: '/contacts' },
+            ],
+          },
+          {
+            title: 'Документы',
+            links: [
+              { label: 'Политика конфиденциальности', href: '/privacy' },
+              { label: 'Договор оферты', href: '/offer' },
+            ],
+          },
+        ],
+        copyright: '© 2024 BUX&TAXES. Все права защищены.',
+      },
+    })
+    console.log('FooterConfig created')
+  }
+
+  console.log('Seeding categories...')
+  const categories = [
+    { name: 'Налоги', slug: 'taxes' },
+    { name: 'Бухгалтерия', slug: 'accounting' },
+    { name: 'Кадры', slug: 'hr' },
+    { name: 'Новости законодательства', slug: 'legislation' },
+  ]
+
+  for (const cat of categories) {
+    const existing = await payload.find({
+      collection: 'categories',
+      where: { slug: { equals: cat.slug } },
+    })
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'categories',
+        data: cat as unknown as any,
+      })
+    }
+  }
+
   console.log('Seeding services...')
   const services = [
     {
       title: 'Бухгалтерское сопровождение ИП',
       slug: 'ip-bookkeeping',
       h1: 'Профессиональное бухгалтерское сопровождение ИП в Казахстане',
-      shortDescription: 'Полное ведение бухгалтерии для индивидуальных предпринимателей на всех режимах налогообложения. От сдачи отчетности до оптимизации налогов.',
+      icon: 'briefcase',
+      shortDescription: 'Полное ведение бухгалтерии для индивидуальных предпринимателей на всех режимах налогообложения.',
       priceFrom: 'от 15 000 ₸',
       whatIsIncluded: [
         { item: 'Расчет налогов и взносов' },
         { item: 'Сдача формы 910.00 или 200.00' },
         { item: 'Ведение кадрового учета' },
         { item: 'Консультации по налогам' },
-        { item: 'Контроль лимитов по доходам' },
-        { item: 'Работа с кабинет налогоплательщика' }
       ],
       reports: [
         { report: '910.00' },
         { report: '200.00' },
-        { report: '700.00' }
+        { report: '700.00' },
       ],
-      responsibility: 'Мы несем полную материальную ответственность за правильность расчетов и своевременность сдачи отчетности. В случае штрафов по нашей вине — оплачиваем их сами.',
-      faq: [
-        { question: 'Какие документы нужны для начала работы?', answer: 'Нам понадобится доступ к кабинету налогоплательщика (ЭЦП) и данные по вашим оборотам (выписки из банков/каспи).' },
-        { question: 'Как передавать документы?', answer: 'Вы можете присылать фото или сканы документов через WhatsApp или Telegram.' }
-      ]
+      responsibility: 'Мы несем полную материальную ответственность за правильность расчетов.',
     },
     {
       title: 'Бухгалтерское сопровождение ТОО',
       slug: 'too-bookkeeping',
       h1: 'Комплексное бухгалтерское сопровождение ТОО',
-      shortDescription: 'Профессиональный учет для товариществ с ограниченной ответственностью с НДС и без НДС. Берем на себя всю рутину.',
+      icon: 'building',
+      shortDescription: 'Профессиональный учет для товариществ с ограниченной ответственностью.',
       priceFrom: 'от 40 000 ₸',
       whatIsIncluded: [
         { item: 'Ведение бухгалтерского и налогового учета' },
-        { item: 'Расчет заработной платы сотрудников' },
+        { item: 'Расчет заработной платы' },
         { item: 'Работа с ЭСФ и СНТ' },
-        { item: 'Статистическая отчетность' },
-        { item: 'Представление интересов в налоговых органах' }
+        { item: 'Представление интересов в налоговых' },
       ],
       reports: [
         { report: '100.00' },
         { report: '300.00' },
         { report: '200.00' },
-        { report: 'Статистика' }
       ],
-      responsibility: 'Гарантируем отсутствие блокировок счетов и штрафов. Ответственность закреплена в договоре.',
-      faq: [
-        { question: 'Входит ли в стоимость расчет зарплаты?', answer: 'Да, расчет зарплаты до 5 сотрудников уже включен в базовую стоимость тарифа.' }
-      ]
+      responsibility: 'Гарантируем отсутствие блокировок счетов и штрафов.',
     },
     {
       title: 'Сдача налоговой отчетности',
       slug: 'tax-reporting',
       h1: 'Разовая сдача налоговой отчетности',
-      shortDescription: 'Поможем подготовить и отправить налоговую отчетность без ошибок и точно в срок. Разовые услуги для тех, кто ведет учет сам.',
+      icon: 'file-text',
+      shortDescription: 'Подготовка и отправка налоговой отчетности без ошибок.',
       priceFrom: 'от 10 000 ₸',
       whatIsIncluded: [
         { item: 'Проверка первичной документации' },
         { item: 'Расчет налоговых обязательств' },
         { item: 'Заполнение налоговой формы' },
-        { item: 'Отправка через кабинет налогоплательщика' },
-        { item: 'Предоставление уведомления о принятии' }
       ],
       reports: [
         { report: '910.00' },
         { report: '200.00' },
         { report: '300.00' },
-        { report: '870.00' }
       ],
-      responsibility: 'Несем ответственность за корректность заполнения данных в соответствии с предоставленными вами документами.',
-      faq: [
-        { question: 'Сколько времени занимает сдача отчета?', answer: 'Обычно мы готовим отчет в течение 1 рабочего дня после получения всех данных.' }
-      ]
+      responsibility: 'Несем ответственность за корректность заполнения данных.',
     },
     {
       title: 'Восстановление бухгалтерского учета',
       slug: 'recovery',
       h1: 'Восстановление бухгалтерского и налогового учета',
-      shortDescription: 'Приведем вашу бухгалтерию в порядок, восстановим недостающие документы и исправим ошибки прошлых периодов для минимизации налоговых рисков.',
+      icon: 'calculator',
+      shortDescription: 'Приведем вашу бухгалтерию в порядок и исправим ошибки прошлых периодов.',
       priceFrom: 'от 50 000 ₸',
       whoLeadsAccount: 'Старший аудитор',
       whatIsIncluded: [
         { item: 'Аудит текущего состояния учета' },
         { item: 'Восстановление первичной документации' },
         { item: 'Корректировка налоговой отчетности' },
-        { item: 'Сверка с налоговыми органами' },
-        { item: 'Настройка учета в 1С' }
       ],
       reports: [
-        { report: 'Все формы за период' }
+        { report: 'Все формы за период' },
       ],
-      responsibility: 'Гарантируем корректность восстановленных данных и отсутствие претензий со стороны налоговой по восстановленному периоду.',
-      faq: [
-        { question: 'Как долго длится процесс восстановления?', answer: 'Зависит от объема работ, обычно от 2 недель до 2 месяцев.' }
-      ]
+      responsibility: 'Гарантируем корректность восстановленных данных.',
     },
-    {
-      title: 'Кадровый учет',
-      slug: 'hr-accounting',
-      h1: 'Профессиональный кадровый учет',
-      shortDescription: 'Полное сопровождение кадрового делопроизводства: от приема на работу до увольнения в строгом соответствии с ТК РК.',
-      priceFrom: 'от 20 000 ₸',
-      whoLeadsAccount: 'HR-специалист',
-      whatIsIncluded: [
-        { item: 'Оформление трудовых договоров' },
-        { item: 'Ведение личных дел' },
-        { item: 'Приказы по личному составу' },
-        { item: 'Регистрация на enbek.kz' },
-        { item: 'Разработка должностных инструкций' }
-      ],
-      reports: [
-        { report: 'ЕСУТ' }
-      ],
-      responsibility: 'Полная защита от трудовых инспекций и штрафов за нарушение кадрового законодательства.',
-      faq: [
-        { question: 'Обязательно ли регистрировать договора на enbek.kz?', answer: 'Да, согласно законодательству РК, это обязательное требование для всех работодателей.' }
-      ]
-    },
-    {
-      title: 'Расчет заработной платы',
-      slug: 'payroll',
-      h1: 'Аутсорсинг расчета заработной платы',
-      shortDescription: 'Точный расчет зарплаты, налогов и социальных отчислений. Конфиденциальность и соблюдение сроков.',
-      priceFrom: 'от 15 000 ₸',
-      whoLeadsAccount: 'Бухгалтер по расчетному столу',
-      whatIsIncluded: [
-        { item: 'Расчет окладов, премий и пособий' },
-        { item: 'Расчет налогов и отчислений (ОПВ, СО, ОСМС, ИПН)' },
-        { item: 'Подготовка платежных ведомостей' },
-        { item: 'Расчет отпускных и больничных' },
-        { item: 'Справки о доходах для сотрудников' }
-      ],
-      reports: [
-        { report: '200.00' }
-      ],
-      responsibility: 'Гарантируем точность расчетов и своевременность перечисления всех платежей.',
-      faq: [
-        { question: 'Можете ли вы рассчитывать зарплату при сменном графике?', answer: 'Да, мы имеем опыт работы с различными системами оплаты труда и графиками работы.' }
-      ]
-    },
-    {
-      title: 'Регистрация ИП и ТОО',
-      slug: 'registration',
-      h1: 'Быстрая регистрация бизнеса в Казахстане',
-      shortDescription: 'Поможем открыть ИП или ТОО под ключ: выбор режима, кодов ОКЭД и консультация по налогам в подарок.',
-      priceFrom: 'от 10 000 ₸',
-      whoLeadsAccount: 'Юрист-консультант',
-      whatIsIncluded: [
-        { item: 'Консультация по выбору формы собственности' },
-        { item: 'Подбор кодов ОКЭД' },
-        { item: 'Подача заявления на регистрацию' },
-        { item: 'Помощь в открытии банковского счета' },
-        { item: 'Выпуск ЭЦП' }
-      ],
-      reports: [
-        { report: 'Уставные документы' }
-      ],
-      responsibility: 'Гарантируем успешную регистрацию с первого раза.',
-      faq: [
-        { question: 'Что лучше: ИП или ТОО?', answer: 'Зависит от ваших целей, масштаба бизнеса и планируемых партнеров. Мы поможем сделать правильный выбор на бесплатной консультации.' }
-      ]
-    }
   ]
 
   for (const service of services) {
     const existing = await payload.find({
       collection: 'services',
-      where: { slug: { equals: service.slug } }
+      where: { slug: { equals: service.slug } },
     })
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'services',
-        data: service as unknown as any // Bypass strict check for seed
+        data: service as unknown as any,
       })
     }
   }
@@ -186,55 +226,80 @@ const seed = async () => {
   console.log('Seeding tariffs...')
   const tariffs = [
     {
-      name: 'ИП на упрощенке (без НДС)',
+      name: 'ИП на упрощенке',
       category: 'IP',
       price: '15 000 ₸ / мес',
       features: [
         { feature: 'До 50 операций в месяц' },
         { feature: 'Сдача 910 формы' },
-        { feature: 'Расчет налогов и взносов' },
-        { feature: 'Консультации 24/7' }
+        { feature: 'Расчет налогов' },
+        { feature: 'Консультации 24/7' },
       ],
       format: 'Удаленно',
-      responsibility: 'Полная финансовая ответственность'
+      responsibility: 'Полная финансовая ответственность',
+      isPopular: false,
     },
     {
-      name: 'ТОО на упрощенке (без НДС)',
+      name: 'ТОО без НДС',
       category: 'TOO_NO_VAT',
       price: '40 000 ₸ / мес',
       features: [
-        { feature: 'До 100 операций в месяц' },
-        { feature: 'Сдача всех форм (910, 200, 870)' },
-        { feature: 'Кадровый учет (до 3 чел)' },
-        { feature: 'ЭСФ / СНТ' }
+        { feature: 'До 100 операций' },
+        { feature: 'Сдача всех форм' },
+        { feature: 'Кадровый учет до 3 чел' },
+        { feature: 'ЭСФ / СНТ' },
       ],
       format: 'Удаленно + курьер',
-      responsibility: 'Полная финансовая ответственность по договору'
+      responsibility: 'Полная финансовая ответственность',
+      isPopular: true,
     },
     {
-      name: 'ТОО на общеустановленном (с НДС)',
+      name: 'ТОО с НДС',
       category: 'TOO_VAT',
       price: 'от 80 000 ₸ / мес',
       features: [
         { feature: 'Любое количество операций' },
         { feature: 'Сдача 300, 200, 100 форм' },
         { feature: 'Импорт / Экспорт' },
-        { feature: 'Валютный контроль' }
+        { feature: 'Валютный контроль' },
       ],
       format: 'Персональный бухгалтер',
-      responsibility: 'Комплексная юридическая и финансовая ответственность'
-    }
+      responsibility: 'Комплексная ответственность',
+      isPopular: false,
+    },
   ]
 
   for (const tariff of tariffs) {
     const existing = await payload.find({
       collection: 'tariffs',
-      where: { name: { equals: tariff.name } }
+      where: { name: { equals: tariff.name } },
     })
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'tariffs',
-        data: tariff as unknown as any
+        data: tariff as unknown as any,
+      })
+    }
+  }
+
+  console.log('Seeding FAQ...')
+  const faqItems = [
+    { question: 'Какие документы нужны для начала работы?', answer: 'Нам понадобится доступ к кабинету налогоплательщика (ЭЦП) и данные по вашим оборотам.', category: 'general', order: 1 },
+    { question: 'Как передавать документы?', answer: 'Вы можете присылать фото или сканы документов через WhatsApp или Telegram.', category: 'general', order: 2 },
+    { question: 'Сколько времени занимает сдача отчета?', answer: 'Обычно мы готовим отчет в течение 1 рабочего дня после получения всех данных.', category: 'taxes', order: 1 },
+    { question: 'Что лучше: ИП или ТОО?', answer: 'Зависит от ваших целей, масштаба бизнеса и планируемых партнеров.', category: 'general', order: 3 },
+    { question: 'Как долго длится процесс восстановления?', answer: 'Зависит от объема работ, обычно от 2 недель до 2 месяцев.', category: 'accounting', order: 1 },
+  ]
+
+  for (const faq of faqItems) {
+    const existing = await payload.find({
+      collection: 'faq',
+      where: { question: { equals: faq.question } },
+    })
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'faq',
+        data: faq as unknown as any,
       })
     }
   }
@@ -244,89 +309,249 @@ const seed = async () => {
     {
       title: 'Изменения в налоговом кодексе 2025',
       slug: 'tax-changes-2025',
-      excerpt: 'Разбираем основные поправки, которые коснутся малого и среднего бизнеса в Казахстане в новом году.',
+      excerpt: 'Разбираем основные поправки, которые коснутся малого и среднего бизнеса в Казахстане.',
       publishedAt: '2024-12-01',
       content: {
         root: {
           children: [
             {
               type: 'paragraph',
-              children: [{ type: 'text', text: 'В 2025 году предпринимателей Казахстана ждет ряд важных изменений. Основное внимание уделяется цифровизации и усилению контроля за наличными оборотами.' }]
+              children: [{ type: 'text', text: 'В 2025 году предпринимателей ждет ряд важных изменений.' }],
             },
-            {
-              type: 'heading',
-              tag: 'h2',
-              children: [{ type: 'text', text: 'Новые ставки МРП и МЗП' }]
-            },
-            {
-              type: 'paragraph',
-              children: [{ type: 'text', text: 'С 1 января 2025 года установлены новые показатели: МРП — 3 932 тенге, МЗП — 85 000 тенге. Это напрямую влияет на расчет налогов, штрафов и социальных платежей.' }]
-            }
-          ]
-        }
-      }
+          ],
+        },
+      },
+      isFeatured: true,
     },
     {
       title: 'Как ИП сдать 910 форму без штрафов',
       slug: 'form-910-guide',
-      excerpt: 'Пошаговая инструкция по заполнению упрощенной декларации для индивидуальных предпринимателей.',
+      excerpt: 'Пошаговая инструкция по заполнению упрощенной декларации.',
       publishedAt: '2024-11-15',
       content: {
         root: {
           children: [
             {
               type: 'paragraph',
-              children: [{ type: 'text', text: 'Форма 910.00 — самая популярная среди малого бизнеса. Мы подготовили чек-лист, чтобы вы не допустили ошибок.' }]
-            }
-          ]
-        }
-      }
+              children: [{ type: 'text', text: 'Форма 910.00 — самая популярная среди малого бизнеса.' }],
+            },
+          ],
+        },
+      },
+      isFeatured: false,
     },
-    {
-      title: 'НДС: что важно знать ИП и ТОО в 2025 году',
-      slug: 'nds-guide-2025',
-      excerpt: 'Когда возникает обязательство по постановке на учет по НДС, какие пороги действуют и как не пропустить момент.',
-      publishedAt: '2024-10-10',
-      content: {
-        root: {
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ type: 'text', text: 'Постановка на учет по НДС — один из самых ответственных моментов в жизни растущего бизнеса. В 2025 году порог составляет 20 000 МРП.' }]
-            }
-          ]
-        }
-      }
-    },
-    {
-      title: 'Штрафы за просрочку отчетности в Казахстане',
-      slug: 'tax-fines-kz',
-      excerpt: 'Подробный обзор административной ответственности за нарушение сроков сдачи налоговых деклараций.',
-      publishedAt: '2024-09-20',
-      content: {
-        root: {
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ type: 'text', text: 'За несвоевременное предоставление отчетности предусмотрено предупреждение, а при повторном нарушении — существенные штрафы.' }]
-            }
-          ]
-        }
-      }
-    }
   ]
 
   for (const post of blogPosts) {
     const existing = await payload.find({
       collection: 'blog',
-      where: { slug: { equals: post.slug } }
+      where: { slug: { equals: post.slug } },
     })
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'blog',
-        data: post as unknown as any
+        data: post as unknown as any,
       })
     }
+  }
+
+  console.log('Seeding pages with blocks...')
+
+  // Create home page with blocks
+  const homePageExists = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'home' } },
+  })
+
+  if (homePageExists.docs.length === 0) {
+    await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'Главная страница',
+        slug: 'home',
+        layout: [
+          {
+            blockType: 'hero',
+            heading: 'Профессиональная бухгалтерия для вашего бизнеса',
+            subheading: 'Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.',
+            showStats: true,
+            ctaText: 'Получить консультацию',
+            ctaLink: '/contacts',
+            secondaryText: 'Узнать подробнее',
+            secondaryLink: '/about',
+          },
+          {
+            blockType: 'servicesOverview',
+            heading: 'Наши услуги',
+            subheading: 'Комплексное бухгалтерское сопровождение для ИП и ТОО',
+            showLink: true,
+            linkText: 'Все услуги',
+            linkHref: '/#services',
+          },
+          {
+            blockType: 'toolsPreview',
+            heading: 'Калькуляторы',
+            subheading: 'Рассчитайте стоимость услуг и налоги самостоятельно',
+          },
+          {
+            blockType: 'tariffs',
+            heading: 'Тарифы',
+            subheading: 'Выберите оптимальный тариф для вашего бизнеса',
+            showLink: true,
+            linkText: 'Подробнее о тарифах',
+            linkHref: '/tariffs',
+          },
+          {
+            blockType: 'latestNews',
+            heading: 'Новости и статьи',
+            subheading: 'Полезная информация о бухгалтерии и налогах',
+            showLink: true,
+            linkText: 'Читать блог',
+            linkHref: '/blog',
+          },
+          {
+            blockType: 'quiz',
+            heading: 'Не знаете какой тариф выбрать?',
+            subheading: 'Ответьте на 3 вопроса и получите рекомендацию',
+          },
+          {
+            blockType: 'clients',
+            heading: 'Наши клиенты',
+            subheading: 'Более 500 компаний доверяют нам свою бухгалтерию',
+          },
+          {
+            blockType: 'faq',
+            heading: 'Частые вопросы',
+            subheading: 'Ответы на самые популярные вопросы о наших услугах',
+            category: 'general',
+          },
+          {
+            blockType: 'contactInfo',
+            heading: 'Свяжитесь с нами',
+            showMap: true,
+          },
+          {
+            blockType: 'contactForm',
+            heading: 'Остались вопросы?',
+            subheading: 'Оставьте заявку и мы свяжемся с вами',
+            successMessage: 'Спасибо за заявку! Мы свяжемся с вами в ближайшее время.',
+          },
+          {
+            blockType: 'cta',
+            heading: 'Готовы начать?',
+            subheading: 'Оставьте заявку и получите бесплатную консультацию',
+            buttonText: 'Оставить заявку',
+            buttonLink: '/contacts',
+            background: 'gradient',
+          },
+        ] as any,
+        seo: {
+          title: 'BUX&TAXES — бухгалтерия для ИП и ТОО в Казахстане',
+          description: 'Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.',
+        },
+      } as unknown as any,
+    })
+    console.log('Home page created')
+  }
+
+  // Create about page
+  const aboutPageExists = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'about' } },
+  })
+
+  if (aboutPageExists.docs.length === 0) {
+    await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'О компании',
+        slug: 'about',
+        layout: [
+          {
+            blockType: 'hero',
+            heading: 'О компании BUX&TAXES',
+            subheading: 'Профессиональная команда бухгалтеров с опытом работы более 10 лет',
+            showStats: false,
+            ctaText: '',
+            ctaLink: '',
+          },
+          {
+            blockType: 'values',
+            heading: 'Наши ценности',
+            subheading: 'То, что делает нас лучшими в своем деле',
+          },
+          {
+            blockType: 'richContent',
+            content: {
+              root: {
+                children: [
+                  {
+                    type: 'paragraph',
+                    children: [{ type: 'text', text: 'Компания BUX&TAXES основана в 2019 году группой профессиональных бухгалтеров и аудиторов.' }],
+                  },
+                ],
+              },
+            },
+          },
+          {
+            blockType: 'clients',
+            heading: 'Наши клиенты',
+            subheading: 'Более 500 компаний доверяют нам',
+          },
+          {
+            blockType: 'contactForm',
+            heading: 'Хотите узнать больше?',
+            subheading: 'Оставьте заявку и мы проведем экскурсию по нашим услугам',
+            successMessage: 'Спасибо! Мы свяжемся с вами в ближайшее время.',
+          },
+        ] as any,
+        seo: {
+          title: 'О компании BUX&TAXES',
+          description: 'Профессиональная бухгалтерская компания в Казахстане',
+        },
+      } as unknown as any,
+    })
+    console.log('About page created')
+  }
+
+  // Create contacts page
+  const contactsPageExists = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'contacts' } },
+  })
+
+  if (contactsPageExists.docs.length === 0) {
+    await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'Контакты',
+        slug: 'contacts',
+        layout: [
+          {
+            blockType: 'hero',
+            heading: 'Контакты',
+            subheading: 'Свяжитесь с нами удобным способом',
+            showStats: false,
+          },
+          {
+            blockType: 'contactInfo',
+            heading: '',
+            showMap: true,
+          },
+          {
+            blockType: 'contactForm',
+            heading: 'Остались вопросы?',
+            subheading: 'Напишите нам и мы свяжемся с вами',
+            successMessage: 'Спасибо за сообщение! Мы ответим в ближайшее время.',
+          },
+        ] as any,
+        seo: {
+          title: 'Контакты BUX&TAXES',
+          description: 'Свяжитесь с нами: телефон, email, адрес',
+        },
+      } as unknown as any,
+    })
+    console.log('Contacts page created')
   }
 
   console.log('Seeding admin user...')
@@ -339,11 +564,12 @@ const seed = async () => {
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@example.com',
-        password: 'admin',
-      },
+        email: 'admin@buxtaxes.kz',
+        password: 'admin123',
+        role: 'admin',
+      } as unknown as any,
     })
-    console.log('Admin user created: admin@example.com / admin')
+    console.log('Admin user created: admin@buxtaxes.kz / admin123')
   } else {
     console.log('Admin user already exists.')
   }
