@@ -290,3 +290,102 @@ Each block is a Payload Block definition + a React component for rendering.
 | `LatestNewsBlock` | heading, subtitle, showCount | Latest blog posts |
 | `FAQBlock` | heading, subtitle, source: 'collection' or 'custom', customFaqs[] | FAQ accordion |
 | `QuizBlock` | heading, subtitle, steps[], completionMessage | Interactive quiz |
+| `ClientsBlock` | heading, subtitle | Client logos from collection |
+| `ContactInfoBlock` | heading, subtitle, showMap | Contact details from SiteSettings |
+| `ContactFormBlock` | heading, subtitle | Lead capture form |
+| `CTABlock` | heading, subtitle, buttons[], bgColor | Call to action banner |
+| `StatsGridBlock` | heading, stats[] with label+value+icon | Statistics grid |
+| `RichContentBlock` | content: richText | Free-form rich text |
+| `ToolsPreviewBlock` | heading, subtitle, tools[] with title+description+href+icon | Calculator tools |
+| `TariffsBlock` | heading, subtitle, categories[] | Tariffs from collection |
+| `ValuesBlock` | heading, subtitle, values[] with title+description+icon | Company values |
+
+---
+
+## Phase 4: Frontend Block Rendering
+
+### RenderBlocks Component
+```typescript
+// src/components/RenderBlocks.tsx
+export function RenderBlocks({ blocks }) {
+  return blocks.map((block, i) => {
+    switch (block.blockType) {
+      case 'hero': return <HeroBlock key={i} {...block} />
+      case 'servicesOverview': return <ServicesOverviewBlock key={i} {...block} />
+      case 'latestNews': return <LatestNewsBlock key={i} {...block} />
+      // ... etc
+    }
+  })
+}
+```
+
+### Dynamic Page Rendering
+```typescript
+// src/app/(site)/[slug]/page.tsx
+export default async function DynamicPage({ params }) {
+  const page = await getPayload().findBySlug('pages', params.slug)
+  return <RenderBlocks blocks={page.layout} />
+}
+
+// src/app/(site)/page.tsx  
+export default async function HomePage() {
+  const page = await getPayload().findBySlug('pages', 'home')
+  return <RenderBlocks blocks={page.layout} />
+}
+```
+
+---
+
+## Phase 5: Pages That Stay As-Is
+
+These pages have complex client-side logic and should NOT be converted to blocks:
+
+- `/calculators/salary` — Salary calculator (client-side state)
+- `/calculators/tax-ip` — IP tax calculator (client-side state)
+- `/calculators/tax-too` — TOO tax calculator (client-side state)
+- `/calculators` — Calculator listing page (can be a block page later)
+
+These pages fetch from Payload collections and stay as dedicated routes:
+
+- `/blog` — Blog listing
+- `/blog/[slug]` — Blog post detail
+- `/services/[slug]` — Service detail page
+
+---
+
+## Phase 6: Seed Script
+
+Rewrite seed to create:
+1. Default SiteSettings global data
+2. Default Navigation global data
+3. Default FooterConfig global data
+4. Home page with all blocks (Hero, ToolsPreview, ServicesOverview, LatestNews, Quiz, FAQ, Clients, Contacts)
+5. About page with blocks (Hero, RichContent, StatsGrid, Values, CTA)
+6. Services data (existing)
+7. Tariffs data (existing)
+8. Blog posts (existing)
+9. Client logos (new)
+
+---
+
+## Migration Strategy
+
+1. Create all new files alongside existing ones
+2. Update `payload.config.ts` to include new collections, globals, blocks
+3. Run database migration (Payload handles this automatically)
+4. Seed new data
+5. Refactor frontend components one by one
+6. Remove old hardcoded components
+7. Test everything
+
+---
+
+## Key Technical Decisions
+
+- **Database**: PostgreSQL (keep existing)
+- **Rich Text**: Lexical editor (keep existing)
+- **Blocks approach**: Payload native blocks field
+- **Typing**: Generate `payload-types.ts` for full type safety
+- **Access Control**: Admin-only write, public read for content
+- **Media**: Local storage with image sizes (keep existing)
+- **Calculators**: Stay as client-side React components (not CMS-managed)
