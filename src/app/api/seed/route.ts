@@ -1,7 +1,7 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { NextResponse } from 'next/server'
-import { runSeed } from '@/lib/seed'
+import { runSeed } from '@/lib/seed/run'
 
 export const dynamic = 'force-dynamic'
 

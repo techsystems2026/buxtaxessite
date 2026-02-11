@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     const payload = await getPayload({ config })
     const siteSettings = await payload.findGlobal({
-      slug: 'siteSettings',
+      slug: 'site-settings',
     })
 
     return {
@@ -47,7 +47,7 @@ export default async function RootLayout({
   try {
     const payload = await getPayload({ config })
     siteSettings = await payload.findGlobal({
-      slug: 'siteSettings',
+      slug: 'site-settings',
     })
   } catch {
     // Use defaults if globals not available

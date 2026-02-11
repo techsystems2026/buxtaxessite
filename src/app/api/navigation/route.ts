@@ -10,11 +10,14 @@ export async function GET() {
         }) as any
 
         const siteSettings = await payload.findGlobal({
-            slug: 'siteSettings',
+            slug: 'site-settings',
         }) as any
 
         return NextResponse.json({
-            items: navigation?.items || [
+            items: (navigation?.items as any[])?.map((item: any) => ({
+                label: item.label,
+                href: item.url
+            })) || [
                 { label: 'Услуги', href: '/#services' },
                 { label: 'Тарифы', href: '/tariffs' },
                 { label: 'Калькуляторы', href: '/calculators' },
@@ -22,7 +25,10 @@ export async function GET() {
                 { label: 'Блог', href: '/blog' },
                 { label: 'Контакты', href: '/contacts' },
             ],
-            ctaButton: navigation?.ctaButton || { text: 'Заказать звонок', href: '/contacts' },
+            ctaButton: navigation?.ctaButton ? {
+                text: navigation.ctaButton.label,
+                href: navigation.ctaButton.url
+            } : { text: 'Заказать звонок', href: '/contacts' },
             phone: siteSettings?.phone || '+7 (777) 123-45-67',
         })
     } catch (error) {

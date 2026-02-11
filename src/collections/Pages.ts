@@ -14,7 +14,7 @@ import {
     ToolsPreviewBlock,
     TariffsBlock,
     ValuesBlock,
-} from '../blocks'
+} from '../blocks/config'
 
 export const Pages: CollectionConfig = {
     slug: 'pages',

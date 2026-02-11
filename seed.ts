@@ -9,7 +9,7 @@ const seed = async () => {
 
   // Seed SiteSettings
   const siteSettingsExists = await payload.findGlobal({
-    slug: 'siteSettings',
+    slug: 'site-settings',
   }).catch(() => null)
 
   if (!siteSettingsExists) {
@@ -50,11 +50,11 @@ const seed = async () => {
       slug: 'navigation',
       data: {
         items: [
-          { label: 'Услуги', href: '/#services', type: 'link' },
-          { label: 'Тарифы', href: '/#tariffs', type: 'link' },
-          { label: 'Блог', href: '/blog', type: 'link' },
-          { label: 'Калькуляторы', href: '/calculators', type: 'link' },
-          { label: 'Контакты', href: '/contacts', type: 'link' },
+          { label: 'Услуги', href: '/#services' },
+          { label: 'Тарифы', href: '/tariffs' },
+          { label: 'Блог', href: '/blog' },
+          { label: 'Калькуляторы', href: '/calculators' },
+          { label: 'Контакты', href: '/contacts' },
         ],
         ctaButton: {
           text: 'Получить консультацию',
@@ -67,45 +67,45 @@ const seed = async () => {
 
   // Seed FooterConfig
   const footerExists = await payload.findGlobal({
-    slug: 'footerConfig',
+    slug: 'footer',
   }).catch(() => null)
 
   if (!footerExists) {
     await payload.updateGlobal({
-      slug: 'footerConfig',
+      slug: 'footer',
       data: {
         description: 'Профессиональное бухгалтерское сопровождение ИП и ТОО в Казахстане. Берем на себя отчёты и общение с налоговой.',
-        linkColumns: [
+        columns: [
           {
             title: 'Услуги',
             links: [
-              { label: 'ИП', href: '/services/ip-bookkeeping' },
-              { label: 'ТОО', href: '/services/too-bookkeeping' },
-              { label: 'Отчетность', href: '/services/tax-reporting' },
-              { label: 'Восстановление', href: '/services/recovery' },
+              { label: 'ИП', url: '/services/ip-bookkeeping' },
+              { label: 'ТОО', url: '/services/too-bookkeeping' },
+              { label: 'Отчетность', url: '/services/tax-reporting' },
+              { label: 'Восстановление', url: '/services/recovery' },
             ],
           },
           {
             title: 'Информация',
             links: [
-              { label: 'О нас', href: '/about' },
-              { label: 'Блог', href: '/blog' },
-              { label: 'Калькуляторы', href: '/calculators' },
-              { label: 'Контакты', href: '/contacts' },
+              { label: 'О нас', url: '/about' },
+              { label: 'Блог', url: '/blog' },
+              { label: 'Калькуляторы', url: '/calculators' },
+              { label: 'Контакты', url: '/contacts' },
             ],
           },
           {
             title: 'Документы',
             links: [
-              { label: 'Политика конфиденциальности', href: '/privacy' },
-              { label: 'Договор оферты', href: '/offer' },
+              { label: 'Политика конфиденциальности', url: '/privacy' },
+              { label: 'Договор оферты', url: '/offer' },
             ],
           },
         ],
-        copyright: '© 2024 BUX&TAXES. Все права защищены.',
+        bottomText: '© 2024 BUX&TAXES. Все права защищены.',
       },
     })
-    console.log('FooterConfig created')
+    console.log('Footer created')
   }
 
   console.log('Seeding categories...')
@@ -124,7 +124,7 @@ const seed = async () => {
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'categories',
-        data: cat as unknown as any,
+        data: cat as any,
       })
     }
   }
@@ -218,7 +218,7 @@ const seed = async () => {
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'services',
-        data: service as unknown as any,
+        data: service as any,
       })
     }
   }
@@ -277,29 +277,7 @@ const seed = async () => {
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'tariffs',
-        data: tariff as unknown as any,
-      })
-    }
-  }
-
-  console.log('Seeding FAQ...')
-  const faqItems = [
-    { question: 'Какие документы нужны для начала работы?', answer: 'Нам понадобится доступ к кабинету налогоплательщика (ЭЦП) и данные по вашим оборотам.', category: 'general', order: 1 },
-    { question: 'Как передавать документы?', answer: 'Вы можете присылать фото или сканы документов через WhatsApp или Telegram.', category: 'general', order: 2 },
-    { question: 'Сколько времени занимает сдача отчета?', answer: 'Обычно мы готовим отчет в течение 1 рабочего дня после получения всех данных.', category: 'taxes', order: 1 },
-    { question: 'Что лучше: ИП или ТОО?', answer: 'Зависит от ваших целей, масштаба бизнеса и планируемых партнеров.', category: 'general', order: 3 },
-    { question: 'Как долго длится процесс восстановления?', answer: 'Зависит от объема работ, обычно от 2 недель до 2 месяцев.', category: 'accounting', order: 1 },
-  ]
-
-  for (const faq of faqItems) {
-    const existing = await payload.find({
-      collection: 'faq',
-      where: { question: { equals: faq.question } },
-    })
-    if (existing.docs.length === 0) {
-      await payload.create({
-        collection: 'faq',
-        data: faq as unknown as any,
+        data: tariff as any,
       })
     }
   }
@@ -350,7 +328,7 @@ const seed = async () => {
     if (existing.docs.length === 0) {
       await payload.create({
         collection: 'blog',
-        data: post as unknown as any,
+        data: post as any,
       })
     }
   }
@@ -371,85 +349,82 @@ const seed = async () => {
         slug: 'home',
         layout: [
           {
-            blockType: 'hero',
+            blockType: 'heroBlock',
             heading: 'Профессиональная бухгалтерия для вашего бизнеса',
-            subheading: 'Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.',
-            showStats: true,
-            ctaText: 'Получить консультацию',
-            ctaLink: '/contacts',
-            secondaryText: 'Узнать подробнее',
-            secondaryLink: '/about',
+            highlightedWord: 'бухгалтерия',
+            subtitle: 'Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.',
+            bulletPoints: [
+              { point: 'Гарантия отсутствия штрафов' },
+              { point: 'Опытные бухгалтеры (10+ лет)' },
+              { point: 'Поддержка 24/7' },
+            ],
+            stats: [
+              { value: '5+', label: 'Лет на рынке', isPrimary: true },
+              { value: '500+', label: 'Клиентов', isPrimary: false },
+            ],
+            ctaButtons: [
+              { label: 'Заказать консультацию', url: '/contacts', variant: 'primary' },
+              { label: 'Посмотреть услуги', url: '/#services', variant: 'outline' },
+            ],
           },
           {
-            blockType: 'servicesOverview',
+            blockType: 'servicesOverviewBlock',
             heading: 'Наши услуги',
-            subheading: 'Комплексное бухгалтерское сопровождение для ИП и ТОО',
-            showLink: true,
-            linkText: 'Все услуги',
-            linkHref: '/#services',
+            subtitle: 'Комплексное бухгалтерское сопровождение для ИП и ТОО',
           },
           {
-            blockType: 'toolsPreview',
+            blockType: 'toolsPreviewBlock',
             heading: 'Калькуляторы',
-            subheading: 'Рассчитайте стоимость услуг и налоги самостоятельно',
+            subtitle: 'Рассчитайте стоимость услуг и налоги самостоятельно',
           },
           {
-            blockType: 'tariffs',
+            blockType: 'tariffsBlock',
             heading: 'Тарифы',
-            subheading: 'Выберите оптимальный тариф для вашего бизнеса',
-            showLink: true,
-            linkText: 'Подробнее о тарифах',
-            linkHref: '/tariffs',
+            subtitle: 'Выберите оптимальный тариф для вашего бизнеса',
           },
           {
-            blockType: 'latestNews',
+            blockType: 'latestNewsBlock',
             heading: 'Новости и статьи',
-            subheading: 'Полезная информация о бухгалтерии и налогах',
-            showLink: true,
-            linkText: 'Читать блог',
-            linkHref: '/blog',
+            subtitle: 'Полезная информация о бухгалтерии и налогах',
           },
           {
-            blockType: 'quiz',
+            blockType: 'quizBlock',
             heading: 'Не знаете какой тариф выбрать?',
-            subheading: 'Ответьте на 3 вопроса и получите рекомендацию',
+            subtitle: 'Ответьте на несколько вопросов и получите рекомендацию',
           },
           {
-            blockType: 'clients',
+            blockType: 'clientsBlock',
             heading: 'Наши клиенты',
-            subheading: 'Более 500 компаний доверяют нам свою бухгалтерию',
+            subtitle: 'Более 500 компаний доверяют нам свою бухгалтерию',
           },
           {
-            blockType: 'faq',
+            blockType: 'faqBlock',
             heading: 'Частые вопросы',
-            subheading: 'Ответы на самые популярные вопросы о наших услугах',
-            category: 'general',
+            subtitle: 'Ответы на самые популярные вопросы',
           },
           {
-            blockType: 'contactInfo',
+            blockType: 'contactInfoBlock',
             heading: 'Свяжитесь с нами',
-            showMap: true,
           },
           {
-            blockType: 'contactForm',
+            blockType: 'contactFormBlock',
             heading: 'Остались вопросы?',
-            subheading: 'Оставьте заявку и мы свяжемся с вами',
-            successMessage: 'Спасибо за заявку! Мы свяжемся с вами в ближайшее время.',
+            subtitle: 'Оставьте заявку и мы свяжемся с вами в ближайшее время',
+            successMessage: 'Спасибо за заявку!',
           },
           {
-            blockType: 'cta',
+            blockType: 'ctaBlock',
             heading: 'Готовы начать?',
-            subheading: 'Оставьте заявку и получите бесплатную консультацию',
-            buttonText: 'Оставить заявку',
-            buttonLink: '/contacts',
-            background: 'gradient',
+            subtitle: 'Оставьте заявку и получите бесплатную консультацию',
+            buttonLabel: 'Оставить заявку',
+            buttonUrl: '/contacts',
           },
         ] as any,
         seo: {
           title: 'BUX&TAXES — бухгалтерия для ИП и ТОО в Казахстане',
           description: 'Ведём учёт, налоги, ЭСФ и СНТ. Берём на себя отчёты и общение с налоговой.',
         },
-      } as unknown as any,
+      } as any,
     })
     console.log('Home page created')
   }
@@ -468,48 +443,43 @@ const seed = async () => {
         slug: 'about',
         layout: [
           {
-            blockType: 'hero',
+            blockType: 'heroBlock',
             heading: 'О компании BUX&TAXES',
-            subheading: 'Профессиональная команда бухгалтеров с опытом работы более 10 лет',
-            showStats: false,
-            ctaText: '',
-            ctaLink: '',
+            subtitle: 'Профессиональная команда бухгалтеров с опытом работы более 10 лет',
           },
           {
-            blockType: 'values',
+            blockType: 'valuesBlock',
             heading: 'Наши ценности',
-            subheading: 'То, что делает нас лучшими в своем деле',
+            subtitle: 'То, что делает нас лучшими в своем деле',
           },
           {
-            blockType: 'richContent',
+            blockType: 'richContentBlock',
             content: {
               root: {
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ type: 'text', text: 'Компания BUX&TAXES основана в 2019 году группой профессиональных бухгалтеров и аудиторов.' }],
+                    children: [{ type: 'text', text: 'Компания BUX&TAXES основана профессиональными бухгалтерами и аудиторами.' }],
                   },
                 ],
               },
             },
           },
           {
-            blockType: 'clients',
+            blockType: 'clientsBlock',
             heading: 'Наши клиенты',
-            subheading: 'Более 500 компаний доверяют нам',
           },
           {
-            blockType: 'contactForm',
+            blockType: 'contactFormBlock',
             heading: 'Хотите узнать больше?',
-            subheading: 'Оставьте заявку и мы проведем экскурсию по нашим услугам',
-            successMessage: 'Спасибо! Мы свяжемся с вами в ближайшее время.',
+            subtitle: 'Оставьте заявку и мы ответим на все вопросы',
           },
         ] as any,
         seo: {
           title: 'О компании BUX&TAXES',
           description: 'Профессиональная бухгалтерская компания в Казахстане',
         },
-      } as unknown as any,
+      } as any,
     })
     console.log('About page created')
   }
@@ -528,28 +498,24 @@ const seed = async () => {
         slug: 'contacts',
         layout: [
           {
-            blockType: 'hero',
+            blockType: 'heroBlock',
             heading: 'Контакты',
-            subheading: 'Свяжитесь с нами удобным способом',
-            showStats: false,
+            subtitle: 'Свяжитесь с нами удобным способом',
           },
           {
-            blockType: 'contactInfo',
-            heading: '',
-            showMap: true,
+            blockType: 'contactInfoBlock',
           },
           {
-            blockType: 'contactForm',
-            heading: 'Остались вопросы?',
-            subheading: 'Напишите нам и мы свяжемся с вами',
-            successMessage: 'Спасибо за сообщение! Мы ответим в ближайшее время.',
+            blockType: 'contactFormBlock',
+            heading: 'Напишите нам',
+            subtitle: 'Мы ответим в ближайшее время',
           },
         ] as any,
         seo: {
           title: 'Контакты BUX&TAXES',
           description: 'Свяжитесь с нами: телефон, email, адрес',
         },
-      } as unknown as any,
+      } as any,
     })
     console.log('Contacts page created')
   }
@@ -567,7 +533,7 @@ const seed = async () => {
         email: 'admin@buxtaxes.kz',
         password: 'admin123',
         role: 'admin',
-      } as unknown as any,
+      } as any,
     })
     console.log('Admin user created: admin@buxtaxes.kz / admin123')
   } else {
