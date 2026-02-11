@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { getPayload } from 'payload'
 import config from './src/payload.config'
 
@@ -14,19 +14,20 @@ const seed = async () => {
 
   if (!siteSettingsExists) {
     await payload.updateGlobal({
-      slug: 'siteSettings',
+      slug: 'site-settings',
       data: {
         siteName: 'BUX&TAXES',
         siteDescription: 'Профессиональная бухгалтерия для ИП и ТОО в Казахстане',
         phone: '+7 (707) 123-45-67',
         email: 'info@buxtaxes.kz',
         address: 'г. Алматы, ул. Абая 123, офис 456',
+        whatsapp: '77071234567',
+        telegram: 'buxtaxes',
         workingHours: 'Пн-Пт: 09:00 - 18:00',
-        socialLinks: {
-          instagram: 'https://instagram.com/buxtaxes',
-          telegram: 'https://t.me/buxtaxes',
-          whatsapp: 'https://wa.me/77071234567',
-        },
+        socialLinks: [
+          { platform: 'instagram', url: 'https://instagram.com/buxtaxes' },
+          { platform: 'facebook', url: 'https://facebook.com/buxtaxes' },
+        ],
         statsBar: {
           enabled: true,
           items: [
@@ -50,15 +51,15 @@ const seed = async () => {
       slug: 'navigation',
       data: {
         items: [
-          { label: 'Услуги', href: '/#services' },
-          { label: 'Тарифы', href: '/tariffs' },
-          { label: 'Блог', href: '/blog' },
-          { label: 'Калькуляторы', href: '/calculators' },
-          { label: 'Контакты', href: '/contacts' },
+          { label: 'Услуги', url: '/#services' },
+          { label: 'Тарифы', url: '/tariffs' },
+          { label: 'Блог', url: '/blog' },
+          { label: 'Калькуляторы', url: '/calculators' },
+          { label: 'Контакты', url: '/contacts' },
         ],
         ctaButton: {
-          text: 'Получить консультацию',
-          href: '/contacts',
+          label: 'Получить консультацию',
+          url: '/contacts',
         },
       },
     })

@@ -18,7 +18,7 @@ export async function getGlobal<T>(slug: string): Promise<T | null> {
     const payload = await getPayloadClient()
     try {
         const result = await payload.findGlobal({
-            slug,
+            slug: slug as any,
         })
         return result as T
     } catch {

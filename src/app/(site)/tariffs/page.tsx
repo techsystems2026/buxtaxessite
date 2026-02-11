@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { Check, Info } from 'lucide-react'

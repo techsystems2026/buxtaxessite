@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MetadataRoute } from 'next'
 import { getPayload } from 'payload'
 import config from '@/payload.config'

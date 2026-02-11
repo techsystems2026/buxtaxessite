@@ -23,8 +23,9 @@ export async function GET() {
         data: {
           email: 'admin@buxtaxes.kz',
           password: 'admin-password-123',
+          role: 'admin',
         },
-      })
+      } as any)
     }
 
     console.log('Running data seed...')
