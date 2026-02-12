@@ -6,16 +6,22 @@ export async function GET() {
     try {
         const payload = await getPayload({ config })
         const footer = await payload.findGlobal({
-            slug: 'footerConfig',
+            slug: 'footer',
         }) as any
 
         const siteSettings = await payload.findGlobal({
-            slug: 'siteSettings',
+            slug: 'site-settings',
         }) as any
 
         return NextResponse.json({
             description: footer?.description || 'Профессиональная бухгалтерия для ИП и ТОО в Казахстане.',
-            linkColumns: footer?.linkColumns || [
+            linkColumns: (footer?.columns as any[])?.map((col: any) => ({
+                title: col.title,
+                links: col.links?.map((link: any) => ({
+                    label: link.label,
+                    href: link.url
+                }))
+            })) || [
                 {
                     title: 'Услуги',
                     links: [
@@ -33,7 +39,7 @@ export async function GET() {
                     ],
                 },
             ],
-            copyright: footer?.copyright || `© ${new Date().getFullYear()} BUX&TAXES. Все права защищены.`,
+            copyright: footer?.bottomText || `© ${new Date().getFullYear()} BUX&TAXES. Все права защищены.`,
             phone: siteSettings?.phone || '+7 (777) 123-45-67',
             email: siteSettings?.email || 'info@buxtaxes.kz',
             address: siteSettings?.address || 'г. Алматы',

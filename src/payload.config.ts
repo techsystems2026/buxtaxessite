@@ -4,8 +4,8 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media, Clients, Pages } from './collections'
-import { SiteSettings, Navigation, FooterConfig } from './globals'
+import { Users, Services, Tariffs, Blog, FAQ, Leads, Categories, Media, Clients, Pages } from './collections/config'
+import { SiteSettings, Navigation, FooterConfig } from './globals/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

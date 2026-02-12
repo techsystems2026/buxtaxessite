@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Payload } from 'payload'
 
 export const runSeed = async (payload: Payload) => {

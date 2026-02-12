@@ -1,7 +1,7 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { NextResponse } from 'next/server'
-import { runSeed } from '@/lib/seed'
+import { runSeed } from '@/lib/seed/run'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,8 +23,9 @@ export async function GET() {
         data: {
           email: 'admin@buxtaxes.kz',
           password: 'admin-password-123',
+          role: 'admin',
         },
-      })
+      } as any)
     }
 
     console.log('Running data seed...')
